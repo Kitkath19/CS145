@@ -58,7 +58,7 @@ print(args.id)
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
 # setting up the intent message of format : ID + unique_iID
-intent_message = f"ID{args.unique_ID}"
+intent_message = f"ID{args.unique_ID}".encode
 # 2.2   Accept Message YYYYYYY
 # accept message will be printed out once it is proven 
 # that there is no alive transaction after doing 2.1
