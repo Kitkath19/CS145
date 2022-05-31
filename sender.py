@@ -5,8 +5,8 @@ import socket
 import argparse
 import hashlib
 
-PID = ""                # Personal ID here
-SENDER_PORT = 0000      # Port number used by the sender
+PID = "2099fba5"                # Personal ID here
+SENDER_PORT = 6679      # Port number used by the sender
 
 
 def parseArguments():
