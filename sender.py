@@ -72,5 +72,4 @@ sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
 acknowledgement, buff = sock.recvfrom(1024)
 # decode acknowledgement number
-trasaction_ID = acknowledgement.decode()
-print(trasaction_ID)
+print(acknowledgement.decode())
