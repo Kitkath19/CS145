@@ -66,10 +66,11 @@ intent_message = f"ID{args.unique_ID}".encode()
 #socket initialization
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # bind socket address to port receiver
-sock.bind(('', args.port_receiver))
+sock.bind(('', args.port_sender))
 # using the intent message from 2.1 send data to address
 sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
 acknowledgement, buff = sock.recvfrom(1024)
 # decode acknowledgement number
-print(acknowledgement.decode())
+trasaction_ID = acknowledgement.decode()
+print(trasaction_ID)
