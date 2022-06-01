@@ -120,12 +120,12 @@ for i in range(len(separated_payload)):
         data_packet = data_packet.encode()
         print(data_packet)
         # using the intent message from 2.1 send data to address
-        sock.sendto(data_packet, (args.IP_address, args.port_sender))
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(1024)
+        acknowledgement_final, _ = sock.recvfrom(args.port_receiver)
         # decode acknowledgement number
-        acknowledgement_final_pout = acknowledgement_final.decode()
-        print(acknowledgement_final_pout)
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
     # checking if NOT the last payload
     else:
         # transmission_number = LASTZ
@@ -138,9 +138,9 @@ for i in range(len(separated_payload)):
         data_packet = data_packet.encode() 
         print(data_packet)
         # using the intent message from 2.1 send data to address
-        sock.sendto(data_packet, (args.IP_address, args.port_sender))
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(1024)
+        acknowledgement_final, _ = sock.recvfrom(args.port_receiver)
         # decode acknowledgement number
-        acknowledgement_final_pout = acknowledgement_final.decode()
-        print(acknowledgement_final_pout)
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
