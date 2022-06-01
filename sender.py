@@ -84,7 +84,7 @@ end_time = time.time()
 
 # Step 3: Sending the Payload
 # computing for the payload size
-payload_size = 50
+payload_size = 1
 # getting the floor function of time
 # better to be less than more
 # if more it will not be accepted
@@ -122,7 +122,7 @@ for i in range(len(separated_payload)):
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(8096)
+        acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
         acknowledgement_final = acknowledgement_final.decode()
         print(acknowledgement_final)
@@ -140,7 +140,7 @@ for i in range(len(separated_payload)):
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(8096)
+        acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
         acknowledgement_final = acknowledgement_final.decode()
         print(acknowledgement_final)
