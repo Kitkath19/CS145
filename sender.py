@@ -1,7 +1,8 @@
 import socket
 import sys
 import argparse
-
+import time
+import math
 
 # STEP 0: Getting the Command Line Input
 # angparse was used so that there can be blank parts
@@ -58,6 +59,9 @@ print(args.id)
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
 # setting up the intent message of format : ID + unique_iID
+# timer for start of initiation
+start_time = time.time()
+# setting up the intent message of format : ID + unique_iID
 intent_message = f"ID{args.unique_ID}".encode()
 # 2.2   Accept Message YYYYYYY
 # accept message will be printed out once it is proven 
@@ -70,7 +74,73 @@ sock.bind(('', args.port_sender))
 # using the intent message from 2.1 send data to address
 sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
-acknowledgement, buff = sock.recvfrom(1024)
+acknowledgement, __ = sock.recvfrom(1024)
 # decode acknowledgement number
 trasaction_ID = acknowledgement.decode()
 print(trasaction_ID)
+# timer for end of initiation -> ACK printed out
+end_time = time.time()
+
+
+# Step 3: Sending the Payload
+# computing for the payload size
+payload_size = end_time - start_time
+# getting the floor function of time
+# better to be less than more
+# if more it will not be accepted
+payload_size = math.floor(payload_size)
+# sending the data packets
+# intent_message = IDWWWWWWWW
+# retrieve intent_message from PART 2 (un)code it
+intent_message = intent_message.decode()
+# transaction_ID = TXNYYYYYYY
+trasaction_ID = TXN + str(trasaction_ID) 
+# file_contents = PAYLOAD
+# open file using the path in input
+# r so that contents can be copied
+file = open(args.filename_payload, "r")
+# save file contents
+payload = str(file.read())
+# separating the contents -> list format
+separated_payload = [payload[i:i+payload_size] for i in range(0, len(payload), payload_size)]
+# sending of details to server
+for i in range(len(separated_payload)):
+    # sequence_number = SNXXXXXXX
+    # always starts at 0
+    sequence_number = str(i)
+    # checking if last payload
+    if i == len(separated_payload) - 1:
+        # transmission_number = LASTZ
+        # 0 if not the last
+        # 1 if the last
+        transmission_number = "1"
+        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
+        data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
+        # encoding the data packet
+        data_packet = data_packet.encode()
+        print(data_packet)
+        # using the intent message from 2.1 send data to address
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+        # store the acknowledgement number from port
+        acknowledgement_final, _ = sock.recvfrom(1024)
+        # decode acknowledgement number
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
+    # checking if NOT the last payload
+    else:
+        # transmission_number = LASTZ
+        # 0 if not the last
+        # 1 if the last
+        transmission_number = "0"
+        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
+        data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
+        # encoding the data packet
+        data_packet = data_packet.encode() 
+        print(data_packet)
+        # using the intent message from 2.1 send data to address
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+        # store the acknowledgement number from port
+        acknowledgement_final, _ = sock.recvfrom(1024)
+        # decode acknowledgement number
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
