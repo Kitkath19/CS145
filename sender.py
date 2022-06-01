@@ -119,7 +119,6 @@ for i in range(len(separated_payload)):
         # encoding the data packet
         data_packet = data_packet.encode()
         print(data_packet)
-        sock.bind(('', args.port_sender))
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
@@ -138,7 +137,6 @@ for i in range(len(separated_payload)):
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
-        sock.bind(('', args.port_sender))
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
