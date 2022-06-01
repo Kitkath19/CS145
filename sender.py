@@ -84,7 +84,7 @@ end_time = time.time()
 
 # Step 3: Sending the Payload
 # computing for the payload size
-payload_size = 50
+payload_size = end_time - start_time
 # getting the floor function of time
 # better to be less than more
 # if more it will not be accepted
@@ -94,7 +94,7 @@ payload_size = math.floor(payload_size)
 # retrieve intent_message from PART 2 (un)code it
 intent_message = intent_message.decode()
 # transaction_ID = TXNYYYYYYY
-trasaction_ID = "TXN" + str(trasaction_ID)  
+trasaction_ID = "TXN" + str(trasaction_ID) 
 # file_contents = PAYLOAD
 # open file using the path in input
 # r so that contents can be copied
@@ -124,8 +124,8 @@ for i in range(len(separated_payload)):
         # store the acknowledgement number from port
         acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
-        acknowledgement_final = acknowledgement_final.decode()
-        print(acknowledgement_final)
+        acknowledgement_final_pout = acknowledgement_final.decode()
+        print(acknowledgement_final_pout)
     # checking if NOT the last payload
     else:
         # transmission_number = LASTZ
@@ -142,5 +142,5 @@ for i in range(len(separated_payload)):
         # store the acknowledgement number from port
         acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
-        acknowledgement_final = acknowledgement_final.decode()
-        print(acknowledgement_final)
+        acknowledgement_final_pout = acknowledgement_final.decode()
+        print(acknowledgement_final_pout)
