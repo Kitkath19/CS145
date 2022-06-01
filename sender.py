@@ -84,7 +84,7 @@ end_time = time.time()
 
 # Step 3: Sending the Payload
 # computing for the payload size
-payload_size = end_time - start_time
+payload_size = 50
 # getting the floor function of time
 # better to be less than more
 # if more it will not be accepted
