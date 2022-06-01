@@ -117,15 +117,16 @@ for i in range(len(separated_payload)):
         # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
         data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
         # encoding the data packet
-        data_packets = data_packet.encode()
+        data_packet = data_packet.encode()
         print(data_packet)
+        sock.bind(('', args.port_sender))
         # using the intent message from 2.1 send data to address
-        sock.sendto(data_packets, (args.IP_address, args.port_receiver))
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, __ = sock.recvfrom(1024)
+        acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
-        #acknowledgement_final = acknowledgement_final.decode()
-        print(acknowledgement_final.decode())
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
     # checking if NOT the last payload
     else:
         # transmission_number = LASTZ
@@ -135,12 +136,13 @@ for i in range(len(separated_payload)):
         # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
         data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
         # encoding the data packet
-        data_packets = data_packet.encode() 
+        data_packet = data_packet.encode() 
         print(data_packet)
+        sock.bind(('', args.port_sender))
         # using the intent message from 2.1 send data to address
-        sock.sendto(data_packets, (args.IP_address, args.port_receiver))
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
         # store the acknowledgement number from port
-        acknowledgement_final, __ = sock.recvfrom(1024)
+        acknowledgement_final, _ = sock.recvfrom(1024)
         # decode acknowledgement number
-        # acknowledgement_final = acknowledgement_final.decode()
-        print(acknowledgement_final.decode())
+        acknowledgement_final = acknowledgement_final.decode()
+        print(acknowledgement_final)
