@@ -94,7 +94,7 @@ payload_size = math.floor(payload_size)
 # retrieve intent_message from PART 2 (un)code it
 intent_message = intent_message.decode()
 # transaction_ID = TXNYYYYYYY
-trasaction_ID = TXN + str(trasaction_ID) 
+trasaction_ID = "TXN" + str(trasaction_ID)  
 # file_contents = PAYLOAD
 # open file using the path in input
 # r so that contents can be copied
