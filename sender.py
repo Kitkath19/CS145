@@ -84,7 +84,7 @@ end_time = time.time()
 
 # Step 3: Sending the Payload
 # computing for the payload size
-payload_size = 1
+payload_size = 10
 # getting the floor function of time
 # better to be less than more
 # if more it will not be accepted
@@ -114,7 +114,7 @@ for i in range(len(separated_payload)):
         # 0 if not the last
         # 1 if the last
         transmission_number = "1"
-        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
+'''        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
         data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
         # encoding the data packet
         data_packet = data_packet.encode()
@@ -126,21 +126,21 @@ for i in range(len(separated_payload)):
         # decode acknowledgement number
         acknowledgement_final = acknowledgement_final.decode()
         print(acknowledgement_final)
-    # checking if NOT the last payload
+    # checking if NOT the last payload'''
     else:
         # transmission_number = LASTZ
         # 0 if not the last
         # 1 if the last
         transmission_number = "0"
-        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
-        data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
-        # encoding the data packet
-        data_packet = data_packet.encode() 
-        print(data_packet)
-        # using the intent message from 2.1 send data to address
-        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
-        # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(1024)
-        # decode acknowledgement number
-        acknowledgement_final = acknowledgement_final.decode()
-        print(acknowledgement_final)
+    # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
+    data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
+    # encoding the data packet
+    data_packet = data_packet.encode() 
+    print(data_packet)
+    # using the intent message from 2.1 send data to address
+    sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+    # store the acknowledgement number from port
+    acknowledgement_final, _ = sock.recvfrom(1024)
+    # decode acknowledgement number
+    acknowledgement_final = acknowledgement_final.decode()
+    print(acknowledgement_final)
