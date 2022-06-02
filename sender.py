@@ -186,7 +186,7 @@ def STEP_3_3():
 # STEP 3.0: Sending the Payload
 # function was used to make the code faster
 def STEP_3_0():
-    global file, payload
+    global file, payload, intent_message
     # sending the data packets
     # intent_message = IDWWWWWWWW
     # retrieve intent_message from PART 2 (un)code it
