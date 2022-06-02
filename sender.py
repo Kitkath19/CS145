@@ -4,6 +4,10 @@ import argparse
 import time
 import math
 
+#declaration of variables that will be used throughout the code
+global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID
+
+
 # STEP 0: Getting the Command Line Input
 # angparse was used so that there can be blank parts
 # blank parts will be replaced by the default value/s
