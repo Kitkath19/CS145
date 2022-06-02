@@ -5,7 +5,7 @@ import time
 import math
 
 #declaration of variables that will be used throughout the code
-global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID
+global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID, intent_messag
 
 
 # STEP 0: Getting the Command Line Input
