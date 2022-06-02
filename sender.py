@@ -5,7 +5,7 @@ import time
 import math
 
 #declaration of variables that will be used throughout the code
-global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID, intent_message
+#global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID, intent_message
 
 
 # STEP 0: Getting the Command Line Input
@@ -79,9 +79,18 @@ print(trasaction_ID)
 # timer for end of initiation -> ACK printed out
 end_time = time.time()
 
-# Step 3: Sending the Payload
-# computing for the payload size
-def Step_3():
+
+# Step 2.5: Checking if there is an existing transaction
+# check if transaction ID says that there is an alive tranaction
+if trasaction_ID == "Existing alive transaction":
+# if there is print Existing alive transaction 
+    print(trasaction_ID)
+# if no live tranaction
+else:
+# continue on step 3
+   # Step 3: Sending the Payload
+    # computing for the payload size
+#def Step_3():
     payload_size = 50
     # getting the floor function of time
     # better to be less than more
@@ -132,13 +141,3 @@ def Step_3():
         # decode acknowledgement number
         acknowledgement_final = acknowledgement_final.decode()
         print(acknowledgement_final)
-
-# Step 2.5: Checking if there is an existing transaction
-# check if transaction ID says that there is an alive tranaction
-if trasaction_ID == "Existing alive transaction":
-# if there is print Existing alive transaction 
-    print(trasaction_ID)
-# if no live tranaction
-else:
-# continue on step 3
-    Step_3()
