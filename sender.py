@@ -6,9 +6,9 @@ import math
 
 # declaration of variables that will be used throughout the code
 # global variables to be used in STEP 0
-global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID
+global filename_payload, IP_address, port_receiver, port_sender, unique_ID
 # global variables to be used in STEP 2
-global start_time, intent_message, sock, acknowledgement
+global trasaction_ID, start_time, intent_message, sock, acknowledgement
 # global variables to be used in STEP 3.0
 global file, payload
 # global variables to be used in STEP 3.1
@@ -20,6 +20,7 @@ global end_time, payload_size
 # STEP 0: Getting the Command Line Input
 # function was used to make the code faster
 def STEP_0():
+    global filename_payload, IP_address, port_receiver, port_sender, unique_ID
     # angparse was used so that there can be blank parts
     # blank parts will be replaced by the default value/s
     # declaration of the use of parser
@@ -67,6 +68,7 @@ def STEP_0():
 # STEP 2: Initiating a Transaction
 # function was used to make the code faster
 def STEP_2():
+    global trasaction_ID, start_time, intent_message, sock, acknowledgement
     # 2.1   Intent Message IDwwwwwwww
     # wwwwwwww is the unique ID given in the email
     # default unique_ID = "2099fba5"
@@ -90,12 +92,13 @@ def STEP_2():
     # decode acknowledgement number
     trasaction_ID = acknowledgement.decode()
     # print out transaction ID to make sure intent was sent
-    return trasaction_ID
+    print(trasaction_ID)
 
 
 # STEP 3.1: Getting the rate
 # function was used to make the code faster
 def STEP_3_1():
+    global first_packet, data_packet, acknowledgement_final
     # send first packet with size 10 to get rate
     # get first 10 initial letters in string
     first_packet = payload[:10]
@@ -117,6 +120,7 @@ def STEP_3_1():
 # Step 3.2: Computing for the rate
 # function was used to make the code faster
 def STEP_3_2():
+    global end_time, payload_size
     # timer for end of initiation -> 1st ACK printed out (part 2.2)
     end_time = time.time()
     # computing for the payload size
@@ -182,6 +186,7 @@ def STEP_3_3():
 # STEP 3.0: Sending the Payload
 # function was used to make the code faster
 def STEP_3_0():
+    global file, payload
     # sending the data packets
     # intent_message = IDWWWWWWWW
     # retrieve intent_message from PART 2 (un)code it
@@ -218,6 +223,5 @@ def STEP_3():
 
 # running STEP 0
 args = STEP_0()
-print(args.filename_payload)
 STEP_2()
 STEP_3()
