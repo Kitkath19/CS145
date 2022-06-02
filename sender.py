@@ -76,8 +76,7 @@ acknowledgement, __ = sock.recvfrom(1024)
 # decode acknowledgement number
 trasaction_ID = acknowledgement.decode()
 print(trasaction_ID)
-# timer for end of initiation -> ACK printed out
-end_time = time.time()
+
 
 
 # Step 2.5: Checking if there is an existing transaction
@@ -88,14 +87,7 @@ if trasaction_ID == "Existing alive transaction":
 # if no live tranaction
 else:
 # continue on step 3
-   # Step 3: Sending the Payload
-    # computing for the payload size
-#def Step_3():
-    payload_size = 50
-    # getting the floor function of time
-    # better to be less than more
-    # if more it will not be accepted
-    payload_size = math.floor(payload_size)
+    # Step 3: Sending the Payload
     # sending the data packets
     # intent_message = IDWWWWWWWW
     # retrieve intent_message from PART 2 (un)code it
@@ -109,15 +101,49 @@ else:
     # save file contents
     payload = str(file.read())
     print(payload)
+    # STEP 3.1: Getting the rate
+    # send first packet with size 10 to get rate
+    # get first 10 initial letters in string
+    first_packet = payload[:10]
+    # send command
+    # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
+    data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet
+    # encoding the data packet
+    data_packet = data_packet.encode() 
+    print(data_packet)
+    # using the intent message from 2.1 send data to address
+    sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+    # store the acknowledgement number from port
+    acknowledgement_final, _ = sock.recvfrom(1024)
+    # decode acknowledgement number
+    acknowledgement_final = acknowledgement_final.decode()
+    print(acknowledgement_final)
+    # Step 3.2: Computing for the rate
+    # timer for end of initiation -> 1st ACK printed out (part 2.2)
+    end_time = time.time()
+    # computing for the payload size
+    payload_size = start_time - end_time 
+    # time I need to use to pass all reqs
+    # example time 90s
+    # 90s/payload size is the rate
+    payload_size = 90 / payload_size
+    # getting the floor function of time
+    # better to be less than more
+    # if more it will not be accepted
+    payload_size = math.floor(payload_size)
+    print(payload_size)
+    payload_size = len(payload) / payload_size
+     print(payload_size)
+    # Step 3.3: Continuing the program
     # separating the contents -> list format
-    separated_payload = [payload[i:i+payload_size] for i in range(0, len(payload), payload_size)]
+    separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), payload_size)]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
         print(separated_payload[i])
         # sequence_number = SNXXXXXXX
         # always starts at 0
-        sequence_number = str(i)
+        sequence_number = str(i+1)
         # checking if last payload
         if i == len(separated_payload) - 1:
             # transmission_number = LASTZ
