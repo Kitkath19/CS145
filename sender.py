@@ -133,7 +133,7 @@ else:
     payload_size = math.floor(payload_size)
     print(payload_size)
     payload_size = len(payload) / payload_size
-     print(payload_size)
+    print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
     separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), payload_size)]
