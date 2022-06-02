@@ -136,7 +136,7 @@ else:
     print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
-    separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), int(payload_size)]
+    separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), int(payload_size))]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
