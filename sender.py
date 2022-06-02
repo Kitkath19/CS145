@@ -209,11 +209,10 @@ def STEP_3_0():
 # STEP 3: Checking if there is an existing transaction
 # function was used to make the code faster
 def STEP_3():
-    globalization()
     # check if transaction ID says that there is an alive tranaction
     if trasaction_ID == "Existing alive transaction":
     # if there is print Existing alive transaction 
-        return trasaction_ID
+        print(trasaction_ID)
     # if no live tranaction
     else:
     # continue on step 3
