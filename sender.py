@@ -122,7 +122,7 @@ else:
     # timer for end of initiation -> 1st ACK printed out (part 2.2)
     end_time = time.time()
     # computing for the payload size
-    payload_size = start_time - end_time 
+    payload_size = end_time - start_time 
     # time I need to use to pass all reqs
     # example time 90s
     # 90s/payload size is the rate
@@ -136,7 +136,7 @@ else:
     print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
-    separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), payload_size)]
+    separated_payload = [payload[i:i+payload_size] for i in range(10, len(payload), int(payload_size)]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
