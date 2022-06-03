@@ -48,7 +48,7 @@ def STEP_3_3():
             # print output
             print(acknowledgement_final)
         except:
-            payload_size = payload_size - 10
+            payload_size = payload_size / 2
                 # repeat setep 3_3
             return STEP_3_3()
 
