@@ -35,21 +35,23 @@ def STEP_3_3():
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
-        # using the intent message from 2.1 send data to address
-        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
-        # store the acknowledgement number from port
-        acknowledgement_final, _ = sock.recvfrom(1024)
-        # check if the command was processed
-        if not acknowledgement_final:
-            # subtract 10 from payload size to be sure
-            payload_size = payload_size - 10
-            # repeat setep 3_3
-            return STEP_3_3()
-        else:
-        # decode acknowledgement number
+        sock.settimout(int(payload_size) + 1)
+        try:
+
+            # using the intent message from 2.1 send data to address
+            sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+            # store the acknowledgement number from port
+            acknowledgement_final, _ = sock.recvfrom(1024)
+
             acknowledgement_final = acknowledgement_final.decode()
             # print output
-            return acknowledgement_final
+            print(acknowledgement_final)
+        except:
+            payload_size = payload_size - 10
+                # repeat setep 3_3
+            return STEP_3_3()
+
+
 
 
 #declaration of variables that will be used throughout the code
