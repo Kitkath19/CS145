@@ -48,7 +48,7 @@ def STEP_3_3():
             # print output
             print(acknowledgement_final)
         except:
-            payload_size = payload_size / 2
+            payload_size = (10 + payload_size) / 2
                 # repeat setep 3_3
             return STEP_3_3()
 
@@ -158,9 +158,9 @@ else:
     # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
     data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet
     # encoding the data packet
+    data_packet = data_packet.encode()
     # timer for start of initiation
-    start_time = time.time()
-    data_packet = data_packet.encode() 
+    start_time = time.time() 
     print(data_packet)
     # using the intent message from 2.1 send data to address
     sock.sendto(data_packet, (args.IP_address, args.port_receiver))
