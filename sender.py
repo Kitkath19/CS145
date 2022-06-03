@@ -108,8 +108,6 @@ args = parser.parse_args()
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
 # setting up the intent message of format : ID + unique_iID
-# timer for start of initiation
-start_time = time.time()
 # setting up the intent message of format : ID + unique_iID
 intent_message = f"ID{args.unique_ID}".encode()
 # 2.2   Accept Message YYYYYYY
@@ -160,6 +158,8 @@ else:
     # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
     data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet
     # encoding the data packet
+    # timer for start of initiation
+    start_time = time.time()
     data_packet = data_packet.encode() 
     print(data_packet)
     # using the intent message from 2.1 send data to address
