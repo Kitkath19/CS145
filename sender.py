@@ -11,7 +11,7 @@ import math
 def STEP_3_3():
     global payload_size
     # separating the contents -> list format
-    separated_payload = [payload[i:i+int(payload_size)] for i in range(10, len(payload), int(payload_size))]
+    separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
@@ -48,7 +48,7 @@ def STEP_3_3():
             # print output
             print(acknowledgement_final)
         except:
-            payload_size = (10 + payload_size) / 2
+            payload_size = (1 + payload_size) / 2
                 # repeat setep 3_3
             return STEP_3_3()
 
@@ -154,7 +154,7 @@ else:
     # STEP 3.1: Getting the rate
     # send first packet with size 10 to get rate
     # get first 10 initial letters in string
-    first_packet = payload[:10]
+    first_packet = payload[:1]
     # send command
     # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
     data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet
