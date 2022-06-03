@@ -149,6 +149,7 @@ else:
     file = open(args.filename_payload, "r")
     # save file contents
     payload = str(file.read())
+    payload = payload.rstrip()
     print(payload)
     # STEP 3.1: Getting the rate
     # send first packet with size 10 to get rate
