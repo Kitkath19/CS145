@@ -35,7 +35,8 @@ def STEP_3_3():
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
-        sock.settimeout(int(payload_size) + 1)
+        if sequence_number == "1":
+            sock.settimout(int(payload_size) + 1)
         try:
 
             # using the intent message from 2.1 send data to address
