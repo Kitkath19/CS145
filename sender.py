@@ -17,7 +17,7 @@ def STEP_3_3():
     run = 0
     # sending of details to server
     for i in range(len(separated_payload)):
-        print(separated_payload[i])
+        #print(separated_payload[i])
         # sequence_number = SNXXXXXXX
         # always starts at 0
         sequence_number = str(run + 1)
@@ -38,7 +38,7 @@ def STEP_3_3():
         RTT_start_time = time.time() 
         # encoding the data packet
         data_packet = data_packet.encode() 
-        #print(data_packet)
+        print(data_packet)
 
         if sequence_number == "1":
             sock.settimeout(math.ceil(int(RTT) + 1))
@@ -186,7 +186,7 @@ else:
     RTT_start_time = time.time()     
     # encoding the data packet
     data_packet = data_packet.encode()
-    #print(data_packet)
+    print(data_packet)
     # using the intent message from 2.1 send data to address
     sock.sendto(data_packet, (args.IP_address, args.port_receiver))
     # store the acknowledgement number from port
