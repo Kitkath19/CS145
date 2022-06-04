@@ -20,7 +20,7 @@ def STEP_3_3():
         print(separated_payload[i])
         # sequence_number = SNXXXXXXX
         # always starts at 0
-        sequence_number = run + 1
+        sequence_number = str(run + 1)
         # checking if last payload
         if i == len(separated_payload) - 1:
             # transmission_number = LASTZ
