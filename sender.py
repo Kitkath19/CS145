@@ -63,7 +63,7 @@ def STEP_3_3():
             #remaining size of the total length of the payload
             remaining_size = len(payload) - int(payload_size)
             # time elapsed
-            time_elapsed = end_time - start_time
+            time_elapsed = math.ceil(end_time - start_time)
             # remaining packets to be sent
             remaining_packets = (95 - time_elapsed) / RTT
             # computing for the payload size
@@ -200,11 +200,13 @@ else:
     # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()
     # computing for the payload size (RTT)
-    RTT = math.ceil(RTT_end_time - RTT_start_time) 
+    RTT = math.ceil(RTT_end_time - RTT_start_time)
+    print(RTT) 
     #remaining size of the total length of the payload
     remaining_size = len(payload) - 1
     # time elapsed
-    time_elapsed = end_time - start_time
+    time_elapsed = math.ceil(end_time - start_time)
+    print(time_elapsed)
     # remaining packets to be sent
     remaining_packets = (95 - time_elapsed) / RTT
     # computing for the payload size
@@ -224,4 +226,4 @@ else:
     print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
-    STEP_3_3()
+    #STEP_3_3()
