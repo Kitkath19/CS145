@@ -208,7 +208,7 @@ else:
     time_elapsed = (end_time - start_time)
     print(time_elapsed)
     # remaining packets to be sent
-    remaining_packets = (95 - time_elapsed) / RTT
+    remaining_packets = (85 - time_elapsed) / RTT
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
