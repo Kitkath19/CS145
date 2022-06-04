@@ -53,21 +53,21 @@ def STEP_3_3():
             # print output
             print(acknowledgement_final)
             # timer for end of initiation -> 1st ACK printed out (part 2.2)
-            RTT_end_time = time.time()
+            #RTT_end_time = time.time()
             # timer for end of initiation -> per transaction to get time elapsed
-            end_time = time.time()
+            #end_time = time.time()
             # remove sent payload from total payload
-            payload = payload[(payload_size - 1):]
+            #payload = payload[(payload_size - 1):]
             # computing for the payload size (RTT)
-            RTT = (RTT_end_time - RTT_start_time)
+            #RTT = (RTT_end_time - RTT_start_time)
             #remaining size of the total length of the payload
-            remaining_size = len(payload) - int(payload_size)
+            #remaining_size = len(payload) - int(payload_size)
             # time elapsed
-            time_elapsed = (end_time - start_time)
+            #time_elapsed = (end_time - start_time)
             # remaining packets to be sent
-            remaining_packets = (95 - time_elapsed) / RTT
+            #remaining_packets = (95 - time_elapsed) / RTT
             # computing for the payload size
-            payload_size = math.floor(remaining_size / remaining_packets)
+            #payload_size = math.floor(remaining_size / remaining_packets)
             run += 1
 
         except:
@@ -208,7 +208,7 @@ else:
     time_elapsed = (end_time - start_time)
     print(time_elapsed)
     # remaining packets to be sent
-    remaining_packets = (85 - time_elapsed) / RTT
+    remaining_packets = (95 - time_elapsed) / RTT
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
