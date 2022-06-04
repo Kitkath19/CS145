@@ -57,7 +57,7 @@ def STEP_3_3():
             # remove sent payload from total payload
             payload = payload[payload_size:]
             # computing for the payload size (RTT)
-            RTT = RTT_end_time - RTT_start_time 
+            RTT = math.ceil(RTT_end_time - RTT_start_time)
             #remaining size of the total length of the payload
             remaining_size = len(payload) - int(payload_size)
             # time elapsed
@@ -197,7 +197,7 @@ else:
     # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()
     # computing for the payload size (RTT)
-    RTT = RTT_end_time - RTT_start_time 
+    RTT = math.ceil(RTT_end_time - RTT_start_time) 
     #remaining size of the total length of the payload
     remaining_size = len(payload) - 1
     # time elapsed
