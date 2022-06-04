@@ -38,7 +38,7 @@ def STEP_3_3():
         RTT_start_time = time.time() 
         # encoding the data packet
         data_packet = data_packet.encode() 
-        print(data_packet)
+        #print(data_packet)
 
         if sequence_number == "1":
             sock.settimeout(math.ceil(int(RTT) + 1))
@@ -174,7 +174,7 @@ else:
     # save file contents
     payload = str(file.read())
     payload = payload.rstrip()
-    print(payload)
+    #print(payload)
     # STEP 3.1: Getting the rate
     # send first packet with size 10 to get rate
     # get first 10 initial letters in string
@@ -186,7 +186,7 @@ else:
     RTT_start_time = time.time()     
     # encoding the data packet
     data_packet = data_packet.encode()
-    print(data_packet)
+    #print(data_packet)
     # using the intent message from 2.1 send data to address
     sock.sendto(data_packet, (args.IP_address, args.port_receiver))
     # store the acknowledgement number from port
@@ -201,12 +201,12 @@ else:
     end_time = time.time()
     # computing for the payload size (RTT)
     RTT = (RTT_end_time - RTT_start_time)
-    print(RTT) 
+    #print(RTT) 
     #remaining size of the total length of the payload
     remaining_size = len(payload) - 1
     # time elapsed
     time_elapsed = (end_time - start_time)
-    print(time_elapsed)
+    #print(time_elapsed)
     # remaining packets to be sent
     remaining_packets = (85 - time_elapsed) / RTT
     # computing for the payload size
@@ -223,7 +223,7 @@ else:
     #payload_size = math.floor(payload_size)
     #print(payload_size)
     #payload_size = len(payload) / payload_size
-    print(payload_size)
+    #print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
     STEP_3_3()
