@@ -13,12 +13,14 @@ def STEP_3_3():
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
+    # number of runs done
+    run = 0
     # sending of details to server
     for i in range(len(separated_payload)):
         print(separated_payload[i])
         # sequence_number = SNXXXXXXX
         # always starts at 0
-        sequence_number = str(i+1)
+        sequence_number = run + 1
         # checking if last payload
         if i == len(separated_payload) - 1:
             # transmission_number = LASTZ
@@ -65,7 +67,8 @@ def STEP_3_3():
             # remaining packets to be sent
             remaining_packets = (95 - time_elapsed) / RTT
             # computing for the payload size
-            payload_size = math.floor(remaining_size - remaining_packets)
+            payload_size = math.floor(remaining_size / remaining_packets)
+            run += 1
 
         except:
             payload_size = (1 + payload_size) / 2
@@ -205,7 +208,7 @@ else:
     # remaining packets to be sent
     remaining_packets = (95 - time_elapsed) / RTT
     # computing for the payload size
-    payload_size = math.floor(remaining_size - remaining_packets)
+    payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
     payload = payload[1:]
     # time I need to use to pass all reqs
