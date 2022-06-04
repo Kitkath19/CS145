@@ -9,7 +9,7 @@ import math
 # Step 3.3: Continuing the program
 # function was used to make the code faster
 def STEP_3_3():
-    global payload_size, remaining_size, RTT
+    global payload_size, remaining_size, RTT, payload
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
