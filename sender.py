@@ -9,7 +9,7 @@ import math
 # Step 3.3: Continuing the program
 # function was used to make the code faster
 def STEP_3_3():
-    global payload_size
+    global payload_size, remaining_size, RTT
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
@@ -32,11 +32,14 @@ def STEP_3_3():
             transmission_number = "0"
         # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
         data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
+        # timer for start of initiation
+        RTT_start_time = time.time() 
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
+
         if sequence_number == "1":
-            sock.settimeout(int(payload_size) + 1)
+            sock.settimeout(int(RTT) + 1)
         try:
 
             # using the intent message from 2.1 send data to address
@@ -47,6 +50,23 @@ def STEP_3_3():
             acknowledgement_final = acknowledgement_final.decode()
             # print output
             print(acknowledgement_final)
+            # timer for end of initiation -> 1st ACK printed out (part 2.2)
+            RTT_end_time = time.time()
+            # timer for end of initiation -> per transaction to get time elapsed
+            end_time = time.time()
+            # remove sent payload from total payload
+            payload = payload[payload_size:]
+            # computing for the payload size (RTT)
+            RTT = RTT_end_time - RTT_start_time 
+            #remaining size of the total length of the payload
+            remaining_size = len(payload) - int(payload_size)
+            # time elapsed
+            time_elapsed = end_time - start_time
+            # remaining packets to be sent
+            remaining_packets = (95 - time_elapsed) / RTT
+            # computing for the payload size
+            payload_size = math.floor(remaining_size - remaining_packets)
+
         except:
             payload_size = (1 + payload_size) / 2
                 # repeat setep 3_3
@@ -107,14 +127,15 @@ args = parser.parse_args()
 # 2.1   Intent Message IDwwwwwwww
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
-# setting up the intent message of format : ID + unique_iID
+# timer for start of initiation
+start_time = time.time()
 # setting up the intent message of format : ID + unique_iID
 intent_message = f"ID{args.unique_ID}".encode()
 # 2.2   Accept Message YYYYYYY
 # accept message will be printed out once it is proven 
 # that there is no alive transaction after doing 2.1
 # YYYYYYY is the transaction id that allows the user to check if the transmission is valid
-#socket initialization
+# socket initialization
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # bind socket address to port receiver
 sock.bind(('', args.port_sender))
@@ -161,7 +182,7 @@ else:
     # encoding the data packet
     data_packet = data_packet.encode()
     # timer for start of initiation
-    start_time = time.time() 
+    RTT_start_time = time.time() 
     print(data_packet)
     # using the intent message from 2.1 send data to address
     sock.sendto(data_packet, (args.IP_address, args.port_receiver))
@@ -172,19 +193,31 @@ else:
     print(acknowledgement_final)
     # Step 3.2: Computing for the rate
     # timer for end of initiation -> 1st ACK printed out (part 2.2)
+    RTT_end_time = time.time()
+    # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()
+    # computing for the payload size (RTT)
+    RTT = RTT_end_time - RTT_start_time 
+    #remaining size of the total length of the payload
+    remaining_size = len(payload) - 1
+    # time elapsed
+    time_elapsed = end_time - start_time
+    # remaining packets to be sent
+    remaining_packets = (95 - time_elapsed) / RTT
     # computing for the payload size
-    payload_size = end_time - start_time 
+    payload_size = math.floor(remaining_size - remaining_packets)
+    # remove first packet from original payload
+    payload = payload[1:]
     # time I need to use to pass all reqs
     # example time 90s
     # 90s/payload size is the rate
-    payload_size = 90 / payload_size
+    # payload_size = 90 / payload_size
     # getting the floor function of time
     # better to be less than more
     # if more it will not be accepted
-    payload_size = math.floor(payload_size)
-    print(payload_size)
-    payload_size = len(payload) / payload_size
+    #payload_size = math.floor(payload_size)
+    #print(payload_size)
+    #payload_size = len(payload) / payload_size
     print(payload_size)
     # Step 3.3: Continuing the program
     # separating the contents -> list format
