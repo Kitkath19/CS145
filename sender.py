@@ -57,7 +57,7 @@ def STEP_3_3():
             # timer for end of initiation -> per transaction to get time elapsed
             end_time = time.time()
             # remove sent payload from total payload
-            payload = payload[payload_size:]
+            payload = payload[(payload_size - 1):]
             # computing for the payload size (RTT)
             RTT = math.ceil(RTT_end_time - RTT_start_time)
             #remaining size of the total length of the payload
@@ -210,7 +210,7 @@ else:
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
-    payload = payload[1:]
+    payload = payload[0:]
     # time I need to use to pass all reqs
     # example time 90s
     # 90s/payload size is the rate
