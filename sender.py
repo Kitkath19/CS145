@@ -119,7 +119,7 @@ def STEP_3_3():
             remaining_size = len(payload) - payload_size
             last_accepted_payload_size = payload_size
             # remaining packets to be sent
-            payload = payload[payload_size:]
+            payload = payload[int(payload_size):]
             PARAMETER_estimation()
             # print(remaining_size)
             
