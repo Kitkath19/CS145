@@ -33,6 +33,9 @@ def RTT_estimation():
     # From the EstimatedRTT and DevRTT, the timeout interval is derived
     TimeoutInterval = EstimatedRTT + (4 * DevRTT)
 
+    if TimeoutInterval != 0:
+        sock.settimeout(math.ceil(int(TimeoutInterval)))
+
 def PARAMETER_estimation():
     # declaration of global variables
     global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, remaining_size, TimeoutInterval, time_elapsed
@@ -42,13 +45,13 @@ def PARAMETER_estimation():
     time_elapsed = (end_time - start_time)
     # remaining packets to be sent
     # remaining_packets = (95 - time_elapsed) / TimeoutInterval
-    remaining_packets = math.ceil(remaining_size / TimeoutInterval)
+    remaining_packets = math.ceil(remaining_size / payload_size)
     if time_elapsed < 95:
         target_time = 95
     else:
         target_time = 120
     # computing for time taken
-    time_taken = (math.ceil(remaining_packets / payload_size) * TimeoutInterval) + time_elapsed
+    time_taken = (remaining_packets * TimeoutInterval) + time_elapsed
     # remaining packets to be sent
     remaining_packets = math.floor((target_time - time_elapsed) / TimeoutInterval)
     
@@ -98,7 +101,7 @@ def STEP_3_3():
 
         
         # timeout interval will be used in settimeout for each packet
-        sock.settimeout(math.ceil(int(TimeoutInterval)))
+        
 
         try:
             # using the intent message from 2.1 send data to address
@@ -140,7 +143,8 @@ def STEP_3_3():
                 limitation = len(payload)   
 
             # print(payload)
-            payload_size = max( (1 + payload_size) / 2, last_accepted_payload_size)
+            payload_size -=1
+            payload_size = max( payload_size, last_accepted_payload_size)
             # repeat setep 3_3
             return STEP_3_3()
 
