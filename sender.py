@@ -70,8 +70,7 @@ def STEP_3_3():
 
         if sequence_number == "1":
                 # timeout interval will be used in settimeout for each packet
-            if TimeoutInterval != 0:
-                sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
+            sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
 
         try:
             # using the intent message from 2.1 send data to address
@@ -238,7 +237,7 @@ else:
     # time elapsed
     time_elapsed = (end_time - start_time)
     # remaining packets to be sent
-    remaining_packets = (95 - time_elapsed) / TimeoutInterval
+    remaining_packets = (85 - time_elapsed) / TimeoutInterval
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
