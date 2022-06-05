@@ -35,7 +35,7 @@ def RTT_estimation():
 
 def PARAMETER_estimation():
     # declaration of global variables
-    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, time_elapsed
+    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, remaining_size, TimeoutInterval, time_elapsed
     # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()     
     # time elapsed
@@ -64,7 +64,7 @@ def PARAMETER_estimation():
 run = 1
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run, SampleRTT
-    global last_accepted_payload_size, time_taken, limitation
+    global last_accepted_payload_size, time_taken, limitation, time_elapsed
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
     print(separated_payload)
@@ -130,7 +130,7 @@ def STEP_3_3():
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil(remaining_size / payload_size)
             # computing for time taken
-            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval  + time_elapsed)
+            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
             if payload_size != last_accepted_payload_size: 
                 limitation = payload_size
             else:
