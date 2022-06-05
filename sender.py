@@ -144,7 +144,7 @@ def STEP_3_3():
 
             # print(payload)
             payload_size -=1
-            payload_size = max( payload_size, last_accepted_payload_size)
+            payload_size = max( (1 + payload_size) / 2, last_accepted_payload_size)
             # repeat setep 3_3
             return STEP_3_3()
 
