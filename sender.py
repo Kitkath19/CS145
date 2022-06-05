@@ -41,7 +41,7 @@ run = 1
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run
     # separating the contents -> list format
-    separated_payload = [payload[i:i+int(payload_size)] for i in range(run, len(payload), int(payload_size))]
+    separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
