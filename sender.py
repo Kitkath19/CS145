@@ -46,13 +46,13 @@ def PARAMETER_estimation():
     # computing for time taken
     time_taken = (remaining_packets * TimeoutInterval) + time_elapsed
     # remaining packets to be sent
-    remaining_packets = math.floor((95 - time_elapsed) / TimeoutInterval)
+    remaining_packets = math.floor((90 - time_elapsed) / TimeoutInterval)
     
-    if 95 < time_taken:
+    if 90 < time_taken:
         payload_size = max(math.ceil(remaining_size / remaining_packets), last_accepted_payload_size + 1)
 
     limitation = len(payload)
-    if 95 < limitation: 
+    if 90 < limitation: 
         payload_size = payload_size
     else:
         payload_size = limitation - 1
@@ -130,7 +130,7 @@ def STEP_3_3():
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil(remaining_size / payload_size)
             # computing for time taken
-            time_taken = (remaining_packets * TimeoutInterval) + TimeoutInterval  + time_elapsed
+            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval  + time_elapsed)
             if payload_size != last_accepted_payload_size: 
                 limitation = payload_size
             else:
