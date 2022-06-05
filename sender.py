@@ -248,7 +248,7 @@ else:
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
-    payload = payload[0:]
+    payload = payload[1:]
 
 
     # Step 3.3: Continuing the program
