@@ -46,12 +46,12 @@ def PARAMETER_estimation():
     # computing for time taken
     time_taken = (remaining_packets * TimeoutInterval) + time_elapsed
     # remaining packets to be sent
-    remaining_packets = math.floor((90 - time_elapsed) / TimeoutInterval)
+    remaining_packets = math.floor((95 - time_elapsed) / TimeoutInterval)
     
-    if 90 < time_taken:
+    if 95 < time_taken:
         payload_size = max(math.ceil(remaining_size / remaining_packets), last_accepted_payload_size + 1)
 
-    if 90 < limitation: 
+    if 95 < limitation: 
         payload_size = payload_size
     else:
         payload_size = limitation - 1
@@ -94,7 +94,7 @@ def STEP_3_3():
 
         
         # timeout interval will be used in settimeout for each packet
-        sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
+        sock.settimeout(math.ceil(int(TimeoutInterval)))
 
         try:
             # using the intent message from 2.1 send data to address
@@ -124,7 +124,7 @@ def STEP_3_3():
             # print(remaining_size)
             
 
-        except:
+        except socket.timeout:
             # remaining packets to be sent
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil(remaining_size / payload_size)
