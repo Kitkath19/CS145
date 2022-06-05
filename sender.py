@@ -85,6 +85,9 @@ def STEP_3_3():
             run += 1
             # update remaining size
             remaining_size = len(payload) - len(payload_size)
+            print(remaining_size)
+            print(len(payload))
+            print(len(payload_size))
 
         except:
             # remaining packets to be sent
