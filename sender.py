@@ -32,15 +32,12 @@ def RTT_estimation():
     # Lecture 11 page 20
     # From the EstimatedRTT and DevRTT, the timeout interval is derived
     TimeoutInterval = EstimatedRTT + (4 * DevRTT)
-    # timeout interval will be used in settimeout for each packet
-    if TimeoutInterval != 0:
-        sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
 
 
 # Step 3.3: Continuing the program
 # function was used to make the code faster
 def STEP_3_3():
-    global payload_size, remaining_size, RTT, payload
+    global payload_size, remaining_size, TimeoutInterval, payload
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
@@ -72,8 +69,10 @@ def STEP_3_3():
         print(data_packet)
 
         if sequence_number == "1":
-            sock.settimeout(math.ceil(int(RTT) + 1))
-            
+                # timeout interval will be used in settimeout for each packet
+            if TimeoutInterval != 0:
+                sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
+
         try:
             # using the intent message from 2.1 send data to address
             sock.sendto(data_packet, (args.IP_address, args.port_receiver))
