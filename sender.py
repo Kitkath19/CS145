@@ -39,7 +39,7 @@ def RTT_estimation():
 # number of runs done
 run = 0
 def STEP_3_3():
-    global payload_size, remaining_size, TimeoutInterval, payload, run
+    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
@@ -83,10 +83,14 @@ def STEP_3_3():
             print(acknowledgement_final)
             # for each successful upload run is incremented
             run += 1
+            # update remaining size
+            remaining_size = len(payload) - len(payload_size)
 
         except:
-            payload_size = (1 + payload_size) / 2
-                # repeat setep 3_3
+            # remaining packets to be sent
+            payload = payload[:remaining_size]
+            payload_size = payload_size - 1
+            # repeat setep 3_3
             return STEP_3_3()
 
 
