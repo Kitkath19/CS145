@@ -290,7 +290,7 @@ else:
     remaining_packets = 0
     time_taken = 0
     last_accepted_payload_size = 1
-    payload_size = 0
+    payload_size = 1
     limitation = len(payload)
     time_elapsed = 0
     PARAMETER_estimation()
