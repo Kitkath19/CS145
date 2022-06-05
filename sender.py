@@ -84,7 +84,7 @@ def STEP_3_3():
             # for each successful upload run is incremented
             run += 1
             # update remaining size
-            remaining_size = len(payload) - len(payload_size)
+            remaining_size = len(payload) - payload_size
             print(remaining_size)
             print(len(payload))
             print(len(payload_size))
