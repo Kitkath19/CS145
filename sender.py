@@ -37,7 +37,7 @@ def RTT_estimation():
 
 def PARAMETER_estimation():
     # declaration of global variables
-    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, remaining_size, TimeoutInterval, time_elapsed
+    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, remaining_size, TimeoutInterval, target_time, time_elapsed
     # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()     
     # time elapsed
