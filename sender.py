@@ -283,12 +283,12 @@ else:
     
     # Step 3.2.2: parameter estimation
     remaining_size = len(payload) - 1
-    PARAMETER_estimation()
     remaining_packets = 0
     time_taken = 0
     last_accepted_payload_size = 0
     payload_size = 0
     limitation = 0
+    PARAMETER_estimation()
     # computing for the payload size
     #payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
