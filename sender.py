@@ -37,18 +37,18 @@ def RTT_estimation():
 # Step 3.3: Continuing the program
 # function was used to make the code faster
 # number of runs done
-run = 0
+run = 1
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run
     # separating the contents -> list format
-    separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
+    separated_payload = [payload[i:i+int(payload_size)] for i in range(run, len(payload), int(payload_size))]
     print(separated_payload)
     # sending of details to server
     for i in range(len(separated_payload)):
         #print(separated_payload[i])
         # sequence_number = SNXXXXXXX
         # always starts at 0
-        sequence_number = str(run + 1)
+        sequence_number = str(run)
         # checking if last payload
         if i == len(separated_payload) - 1:
             # transmission_number = LASTZ
