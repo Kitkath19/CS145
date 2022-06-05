@@ -5,6 +5,37 @@ import time
 import math
 
 
+# the formula for this function was retrieved from lecture 11
+def RTT_estimation():
+# declaration of global variables
+    global EstimatedRTT, DevRTT, TimeoutInterval, SampleRTT
+    # part 1 - estimated RTT computation
+    # check if this is the initial transactiom
+    # if it is the initial
+    if EstimatedRTT == 0:
+    # set EstimatedRTT = RTT
+    # the RTT was computed previously  RTT = (RTT_end_time - RTT_start_time)
+        EstimatedRTT = SampleRTT
+    # if it is not the initial
+    else:
+    # Lecture 11 page 18
+    # “Average” of SampleRTT values must be taken; in TCP, this is called EstimatedRTT
+    # EstimatedRTT updated for each new value of SampleRTT
+        EstimatedRTT = (1 - 0.125) * EstimatedRTT + 0.125 * SampleRTT
+
+    # part 2 - dev RTT computation
+    # Lecture 11 page 19
+    # DevRTT - estimate of how much SampleRTT typically varies from EstimatedRTT
+    DevRTT = (1 - 0.25) * DevRTT + 0.25 * abs(SampleRTT - EstimatedRTT)
+
+    # part 3 - rate update
+    # Lecture 11 page 20
+    # From the EstimatedRTT and DevRTT, the timeout interval is derived
+    TimeoutInterval = EstimatedRTT + (4 * DevRTT)
+    # timeout interval will be used in settimeout for each packet
+    if TimeoutInterval != 0:
+        sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
+
 
 # Step 3.3: Continuing the program
 # function was used to make the code faster
@@ -42,32 +73,17 @@ def STEP_3_3():
 
         if sequence_number == "1":
             sock.settimeout(math.ceil(int(RTT) + 1))
+            
         try:
-
             # using the intent message from 2.1 send data to address
             sock.sendto(data_packet, (args.IP_address, args.port_receiver))
             # store the acknowledgement number from port
             acknowledgement_final, _ = sock.recvfrom(1024)
-
+            # decode acknowledgement number
             acknowledgement_final = acknowledgement_final.decode()
             # print output
             print(acknowledgement_final)
-            # timer for end of initiation -> 1st ACK printed out (part 2.2)
-            #RTT_end_time = time.time()
-            # timer for end of initiation -> per transaction to get time elapsed
-            #end_time = time.time()
-            # remove sent payload from total payload
-            #payload = payload[(payload_size - 1):]
-            # computing for the payload size (RTT)
-            #RTT = (RTT_end_time - RTT_start_time)
-            #remaining size of the total length of the payload
-            #remaining_size = len(payload) - int(payload_size)
-            # time elapsed
-            #time_elapsed = (end_time - start_time)
-            # remaining packets to be sent
-            #remaining_packets = (95 - time_elapsed) / RTT
-            # computing for the payload size
-            #payload_size = math.floor(remaining_size / remaining_packets)
+            # for each successful upload run is incremented
             run += 1
 
         except:
@@ -158,8 +174,8 @@ if trasaction_ID == "Existing alive transaction":
 # if there is print Existing alive transaction 
     print(trasaction_ID)
 # if no live tranaction
-else:
 # continue on step 3
+else:
     # Step 3: Sending the Payload
     # sending the data packets
     # intent_message = IDWWWWWWWW
@@ -174,10 +190,11 @@ else:
     # save file contents
     payload = str(file.read())
     payload = payload.rstrip()
-    #print(payload)
-    # STEP 3.1: Getting the rate
-    # send first packet with size 10 to get rate
-    # get first 10 initial letters in string
+    
+
+    # STEP 3.1: Initial Transaction
+    # send first packet with size 1 to get rate
+    # get first initial letter in string
     first_packet = payload[:1]
     # send command
     # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
@@ -194,36 +211,41 @@ else:
     # decode acknowledgement number
     acknowledgement_final = acknowledgement_final.decode()
     print(acknowledgement_final)
-    # Step 3.2: Computing for the rate
+
+
+    # Step 3.2.1: Computing for the rate
     # timer for end of initiation -> 1st ACK printed out (part 2.2)
     RTT_end_time = time.time()
-    # timer for end of initiation -> per transaction to get time elapsed
-    end_time = time.time()
     # computing for the payload size (RTT)
-    RTT = (RTT_end_time - RTT_start_time)
-    #print(RTT) 
-    #remaining size of the total length of the payload
+    SampleRTT = (RTT_end_time - RTT_start_time)
+    #print(RTT)
+    # set initial EstimatedRTT to 0
+    # since no transaction/runs were made
+    EstimatedRTT = 0
+    # set initial TimeoutInterval to 0
+    # since no transaction/runs were made
+    TimeoutInterval = 0
+    # set initial DevRTT to 0
+    # since no transaction/runs were made
+    DevRTT = 0
+    RTT_estimation()
+    
+    # Step 3.2.2: remaining size of the total length of the payload
     remaining_size = len(payload) - 1
+    
+    # Step 3.2.3: Computing for the updated parameters
+    # timer for end of initiation -> per transaction to get time elapsed
+    end_time = time.time()     
     # time elapsed
     time_elapsed = (end_time - start_time)
-    #print(time_elapsed)
     # remaining packets to be sent
-    remaining_packets = (85 - time_elapsed) / RTT
+    remaining_packets = (95 - time_elapsed) / TimeoutInterval
     # computing for the payload size
     payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
     payload = payload[0:]
-    # time I need to use to pass all reqs
-    # example time 90s
-    # 90s/payload size is the rate
-    # payload_size = 90 / payload_size
-    # getting the floor function of time
-    # better to be less than more
-    # if more it will not be accepted
-    #payload_size = math.floor(payload_size)
-    #print(payload_size)
-    #payload_size = len(payload) / payload_size
-    #print(payload_size)
+
+
     # Step 3.3: Continuing the program
     # separating the contents -> list format
     STEP_3_3()
