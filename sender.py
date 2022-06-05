@@ -36,13 +36,13 @@ def RTT_estimation():
 
 # Step 3.3: Continuing the program
 # function was used to make the code faster
+# number of runs done
+run = 0
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
-    # number of runs done
-    run = 0
     # sending of details to server
     for i in range(len(separated_payload)):
         #print(separated_payload[i])
