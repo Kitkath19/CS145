@@ -86,12 +86,12 @@ def STEP_3_3():
             # update remaining size
             remaining_size = len(payload) - payload_size
             print(remaining_size)
-            print(len(payload))
-            print(len(payload_size))
+            
 
         except:
             # remaining packets to be sent
             payload = payload[:remaining_size]
+            print(payload)
             payload_size = payload_size - 1
             # repeat setep 3_3
             return STEP_3_3()
