@@ -33,13 +33,38 @@ def RTT_estimation():
     # From the EstimatedRTT and DevRTT, the timeout interval is derived
     TimeoutInterval = EstimatedRTT + (4 * DevRTT)
 
+def PARAMETER_estimation():
+    # declaration of global variables
+    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation
+    # timer for end of initiation -> per transaction to get time elapsed
+    end_time = time.time()     
+    # time elapsed
+    time_elapsed = (end_time - start_time)
+    # remaining packets to be sent
+    # remaining_packets = (95 - time_elapsed) / TimeoutInterval
+    remaining_packets = math.ceil(remaining_size / TimeoutInterval)
+    # computing for time taken
+    time_taken = (remaining_packets * TimeoutInterval) + remaining_size
+    # remaining packets to be sent
+    remaining_packets = math.floor((95 - time_elapsed) / TimeoutInterval)
+    
+    if 95 < time_taken:
+        payload_size = max(math.floor(remaining_size / remaining_packets), last_accepted_payload_size + 1)
+
+    limitation = len(payload)
+    if 95 < limitation: 
+        payload_size = payload_size
+    else:
+        payload_size = limitation - 1
+
 
 # Step 3.3: Continuing the program
 # function was used to make the code faster
 # number of runs done
 run = 1
 def STEP_3_3():
-    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run
+    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run, SampleRTT
+    global last_accepted_payload_size, time_taken, limitation
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
     print(separated_payload)
@@ -62,15 +87,15 @@ def STEP_3_3():
             transmission_number = "0"
         # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
         data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
-        # timer for start of initiation
-        RTT_start_time = time.time() 
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
+        # timer for start of initiation
+        RTT_start_time = time.time() 
 
-        if sequence_number == "1":
-                # timeout interval will be used in settimeout for each packet
-            sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
+        
+        # timeout interval will be used in settimeout for each packet
+        sock.settimeout(math.ceil(int(TimeoutInterval) + 1))
 
         try:
             # using the intent message from 2.1 send data to address
@@ -81,18 +106,37 @@ def STEP_3_3():
             acknowledgement_final = acknowledgement_final.decode()
             # print output
             print(acknowledgement_final)
+
+            # timer for end of initiation -> 1st ACK printed out (part 2.2)
+            RTT_end_time = time.time()
+            # computing for the payload size (RTT)
+            SampleRTT = (RTT_end_time - RTT_start_time)
+            RTT_estimation()
+
             # for each successful upload run is incremented
             run += 1
             # update remaining size
             remaining_size = len(payload) - payload_size
+            PARAMETER_estimation()
+            # remaining packets to be sent
+            payload = payload[:remaining_size]
             # print(remaining_size)
             
 
         except:
+
             # remaining packets to be sent
-            payload = payload[:remaining_size]
+            # remaining_packets = (95 - time_elapsed) / TimeoutInterval
+            remaining_packets = math.ceil(remaining_size / TimeoutInterval)
+            # computing for time taken
+            time_taken = (remaining_packets * TimeoutInterval) + remaining_size
+            if payload_size != last_accepted_payload_size: 
+                limitation = payload_size
+            else:
+                limitation = len(payload)   
+
             # print(payload)
-            payload_size = (1 + payload_size) / 2
+            payload_size = max(payload_size - 1, last_accepted_payload_size)
             # repeat setep 3_3
             return STEP_3_3()
 
@@ -233,20 +277,20 @@ else:
     # set initial DevRTT to 0
     # since no transaction/runs were made
     DevRTT = 0
+    # set initial last payload size to 0
+    # since no transaction/runs were made
     RTT_estimation()
     
-    # Step 3.2.2: remaining size of the total length of the payload
+    # Step 3.2.2: parameter estimation
     remaining_size = len(payload) - 1
-    
-    # Step 3.2.3: Computing for the updated parameters
-    # timer for end of initiation -> per transaction to get time elapsed
-    end_time = time.time()     
-    # time elapsed
-    time_elapsed = (end_time - start_time)
-    # remaining packets to be sent
-    remaining_packets = (85 - time_elapsed) / TimeoutInterval
+    PARAMETER_estimation()
+    remaining_packets = 0
+    time_taken = 0
+    last_accepted_payload_size = 0
+    payload_size = 0
+    limitation = 0
     # computing for the payload size
-    payload_size = math.floor(remaining_size / remaining_packets)
+    #payload_size = math.floor(remaining_size / remaining_packets)
     # remove first packet from original payload
     payload = payload[1:]
 
