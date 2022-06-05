@@ -39,7 +39,7 @@ def RTT_estimation():
 # number of runs done
 run = 0
 def STEP_3_3():
-    global payload_size, remaining_size, TimeoutInterval, payload
+    global payload_size, remaining_size, TimeoutInterval, payload, run
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(1, len(payload), int(payload_size))]
     print(separated_payload)
