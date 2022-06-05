@@ -51,7 +51,6 @@ def PARAMETER_estimation():
     if 90 < time_taken:
         payload_size = max(math.ceil(remaining_size / remaining_packets), last_accepted_payload_size + 1)
 
-    limitation = len(payload)
     if 90 < limitation: 
         payload_size = payload_size
     else:
@@ -115,6 +114,7 @@ def STEP_3_3():
 
             # for each successful upload run is incremented
             run += 1
+
             # update remaining size
             remaining_size = len(payload) - payload_size
             last_accepted_payload_size = payload_size
@@ -125,7 +125,6 @@ def STEP_3_3():
             
 
         except:
-
             # remaining packets to be sent
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil(remaining_size / payload_size)
@@ -288,7 +287,7 @@ else:
     time_taken = 0
     last_accepted_payload_size = 1
     payload_size = 0
-    limitation = 0
+    limitation = len(payload)
     time_elapsed = 0
     PARAMETER_estimation()
     # computing for the payload size
