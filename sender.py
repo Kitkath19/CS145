@@ -49,17 +49,17 @@ def PARAMETER_estimation():
         #run += 1
 
     time_elapsed = time.time() - start_time
-    target_time = target_time if time_elapsed < target_time else 120
+    #target_time = target_time if time_elapsed < target_time else 120
     rem_data = original - sent_packets
     rem_packets = math.ceil(rem_data / payload_size)
     time_taken = time_elapsed + (rem_packets * TimeoutInterval)
 
-    rem_time = target_time - time_elapsed
+    rem_time = 95 - time_elapsed
     rem_data = original - sent_packets
     rem_packets = math.floor(rem_time/TimeoutInterval)
-    if time_taken > target_time:
+    if time_taken > 95:
         payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
-        payload_size = payload_size if payload_size < limitation else limitation - 1
+        #payload_size = payload_size if payload_size < limitation else limitation - 1
 
 
 # Step 3.3: Continuing the program
@@ -72,7 +72,7 @@ def STEP_3_3():
     while remaining_size >= 0:
         # separating the contents -> list format
         separated_payload = payload[sent_packets: sent_packets + int(payload_size)]
-        print(separated_payload)
+        # print(separated_payload)
         # sending of details to server
 
         #print(separated_payload[i])
