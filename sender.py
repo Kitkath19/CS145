@@ -40,10 +40,7 @@ def PARAMETER_estimation():
     global time_elapsed, remaining_size, payload_size, target_time, time_taken, remaining_packets, TimeoutInterval
     global last_accepted_payload_size, limitation, sent_packets, original
 
-    # updating the total of send packets
-    sent_packets = sent_packets + payload_size
-    # setting the last_accepted_payload_size to the payload_size
-    last_accepted_payload_size = payload_size
+    
 
     # end time
     end_time = time.time()
@@ -121,20 +118,26 @@ def STEP_3():
             # print output
             print(acknowledgement_final)
 
-            # timer for end of initiation -> 1st ACK printed out (part 2.2)
-            RTT_end_time = time.time()
-            # computing for the payload size (RTT)
-            SampleRTT = (RTT_end_time - RTT_start_time)
-            RTT_estimation()
+
             # timeout interval will be used in settimeout for each packet
             #if TimeoutInterval != 0:
             #    sock.settimeout(math.ceil(TimeoutInterval))
                 
             # for each successful upload run is incremented
             run += 1
-
-            # update remaining size
-            PARAMETER_estimation()
+            # updating the total of send packets
+            sent_packets = sent_packets + payload_size
+            # setting the last_accepted_payload_size to the payload_size
+            last_accepted_payload_size = payload_size
+            
+            if sequence_number == "0":
+                # timer for end of initiation -> 1st ACK printed out (part 2.2)
+                RTT_end_time = time.time()
+                # computing for the payload size (RTT)
+                SampleRTT = (RTT_end_time - RTT_start_time)
+                RTT_estimation()
+                # update remaining size
+                PARAMETER_estimation()
             # print(remaining_size)
             
 
