@@ -64,7 +64,7 @@ def PARAMETER_estimation():
     # if it is greater
     if time_taken > target_time:
     # checking which size is greater so that it can try to reach the target time
-        payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
+        payload_size = max( math.ceil(data_left / packets_left), last_accepted_payload_size + 1 )
         # checking if the size is greater than the limit set previously
         # if it is less
         if payload_size < limitation:
