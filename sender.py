@@ -95,11 +95,10 @@ def STEP_3_3():
         # encoding the data packet
         data_packet = data_packet.encode() 
         print(data_packet)
-
+        # using the intent message from 2.1 send data to address
+        sock.sendto(data_packet, (args.IP_address, args.port_receiver))
 
         try:
-            # using the intent message from 2.1 send data to address
-            sock.sendto(data_packet, (args.IP_address, args.port_receiver))
             # timer for start of initiation
             RTT_start_time = time.time() 
             # store the acknowledgement number from port
