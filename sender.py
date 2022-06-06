@@ -78,7 +78,7 @@ def STEP_3_3():
         # always starts at 0
         sequence_number = str(run)
         # checking if last payload
-        if run == len(separated_payload) - 1:
+        if sent_packets == len(payload) - 1:
             # transmission_number = LASTZ
             # 0 if not the last
             # 1 if the last
