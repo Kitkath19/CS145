@@ -52,28 +52,21 @@ def PARAMETER_estimation():
     time_elapsed = time.time() - start_time
     target_time = target_time if time_elapsed < target_time else 120
     # time left to send the remaining payload
-    time_left = target_time - time_elapsed
+    rem_time = target_time - time_elapsed
     # compute for the remaining data to be sent
-    data_left = original - sent_packets
-    # divide the data into packets then compute for the estimate time it will take
-    time_taken = time_elapsed + (math.ceil(data_left / payload_size) * TimeoutInterval)
+    rem_data = original - sent_packets
     # divide the data into packets
-    packets_left = math.floor(time_left/TimeoutInterval)
+    rem_packets = math.ceil(rem_data / payload_size)
+    # compute for the estimate time it will take
+    time_taken = time_elapsed + (rem_packets * TimeoutInterval)
+    # divide the data into packets
+    rem_packets = math.floor(rem_time/TimeoutInterval)
     
     # chceking if it will exceed the target time of 95s
     # if it is greater
     if time_taken > target_time:
-    # checking which size is greater so that it can try to reach the target time
-        payload_size = max( math.ceil(data_left / packets_left), last_accepted_payload_size + 1 )
-        # checking if the size is greater than the limit set previously
-        # if it is less
-        if payload_size < limitation:
-        # set the current payload size as the size
-            payload_size = payload_size 
-        # if it is more
-        else:
-        # lessen the limit and set it to the payload size so it can reach the target time
-            payload_size = limitation - 1
+        payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
+        payload_size = payload_size if payload_size < limitation else limitation - 1
 
 
 # Step 3.3: Continuing the program
@@ -146,20 +139,11 @@ def STEP_3():
             remaining_packets = math.ceil((original - sent_packets) / payload_size)
             # computing for time taken
             time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
-            
-            # getting the boundaries of the payload
-            if payload_size != last_accepted_payload_size:
-            # setting the uper bound to the payload size
-                limitation = payload_size
-            # setting the uper bound to the total payload size
-            else:
-                limitation = original
 
-            # computing which payload is bigger
-            # using the payload in the next run
+            limitation = payload_size if payload_size != last_accepted_payload_size else original
             payload_size = max(payload_size - 1, last_accepted_payload_size)
-            # repeat setep 3
-            return STEP_3()
+            # repeat setep 3_3
+            return STEP_3_3()
 
 
 
