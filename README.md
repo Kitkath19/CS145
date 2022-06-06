@@ -16,13 +16,13 @@ the sender to reach the receiver of the test server. The program is created in P
   
   
 # Project Implementation
-<ol>
-<li>Open 2 (two) terminals</li>
-  - Terminal A: running the sender code
-  - Terminal B: running the packet tracing code (wireshark/tshark)
-<li>Connect to the AWS server</li>
-  - SSH in the terminal using the command: ssh -i "<key>" ubuntu@<PUBLIC IP address>
-    in my case it is: ssh -i "kdlc.pem" ubuntu@<PUBLIC IP address>
+
+1. Open 2 (two) terminals
+- Terminal A: running the sender code
+- Terminal B: running the packet tracing code (wireshark/tshark)
+2. Connect to the AWS serve
+- SSH in the terminal using the command: ssh -i "<key>" ubuntu@<PUBLIC IP address>
+- in my case it is: ssh -i "kdlc.pem" ubuntu@<PUBLIC IP address>
 (3) Connect to GitHub
   - once connected always do a "git pull" to update the files in the current directory
 (4) Download the Payload
