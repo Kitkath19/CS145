@@ -115,7 +115,7 @@ def STEP_3():
             # timer for start of initiation
             RTT_start_time = time.time() 
             # store the acknowledgement number from port
-            acknowledgement_final, _ = sock.recvfrom(args.port_receiver)
+            acknowledgement_final, _ = sock.recvfrom(1024)
             # decode acknowledgement number
             acknowledgement_final = acknowledgement_final.decode()
             # print output
@@ -222,7 +222,7 @@ sock.bind(('', args.port_sender))
 # using the intent message from 2.1 send data to address
 sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
-acknowledgement, __ = sock.recvfrom(args.port_receiver)
+acknowledgement, __ = sock.recvfrom(1024)
 # timer for start of initiation
 start_time = time.time()
 # decode acknowledgement number
