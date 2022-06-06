@@ -129,7 +129,7 @@ def STEP_3_3():
         except socket.timeout:
             # remaining packets to be sent
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
-            remaining_packets = math.ceil(original - sent_packets / payload_size)
+            remaining_packets = math.ceil((original - sent_packets) / payload_size)
             # computing for time taken
             time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
 
