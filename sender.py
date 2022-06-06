@@ -71,7 +71,7 @@ def STEP_3_3():
     global last_accepted_payload_size, time_taken, limitation, time_elapsed
     while remaining_size >= 0:
         # separating the contents -> list format
-        separated_payload = payload[sent_packets:sent_packets+int(payload_size)]
+        separated_payload = payload[0:int(payload_size)]
         print(separated_payload)
         # sending of details to server
 
