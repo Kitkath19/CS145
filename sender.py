@@ -252,7 +252,7 @@ else:
     remaining_size = len(payload)
     remaining_packets = 0
     time_taken = 0
-    last_accepted_payload_size = 1
+    last_accepted_payload_size = 0
     payload_size = 1
     
     time_elapsed = 0
