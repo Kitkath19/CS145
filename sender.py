@@ -102,7 +102,7 @@ def STEP_3_3():
             # timer for start of initiation
             RTT_start_time = time.time() 
             # store the acknowledgement number from port
-            acknowledgement_final, _ = sock.recvfrom(1024)
+            acknowledgement_final, _ = sock.recvfrom(args.port_receiver)
             # decode acknowledgement number
             acknowledgement_final = acknowledgement_final.decode()
             # print output
@@ -131,7 +131,7 @@ def STEP_3_3():
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil((original - sent_packets) / payload_size)
             # computing for time taken
-            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
+            time_taken =  time_elapsed + TimeoutInterval + remaining_packets * TimeoutInterval
 
             if payload_size != last_accepted_payload_size: 
                 limitation = payload_size
