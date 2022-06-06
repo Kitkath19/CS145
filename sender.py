@@ -74,27 +74,27 @@ def STEP_3_3():
         separated_payload = payload[sent_packets:sent_packets+int(payload_size)]
         print(separated_payload)
         # sending of details to server
-        for i in range(len(separated_payload)):
-            #print(separated_payload[i])
-            # sequence_number = SNXXXXXXX
-            # always starts at 0
-            sequence_number = str(run)
-            # checking if last payload
-            if i == len(separated_payload) - 1:
-                # transmission_number = LASTZ
-                # 0 if not the last
-                # 1 if the last
-                transmission_number = "1"
-            else:
-                # transmission_number = LASTZ
-                # 0 if not the last
-                # 1 if the last
-                transmission_number = "0"
-            # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
-            data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
-            # encoding the data packet
-            data_packet = data_packet.encode() 
-            print(data_packet)
+
+        #print(separated_payload[i])
+        # sequence_number = SNXXXXXXX
+        # always starts at 0
+        sequence_number = str(run)
+        # checking if last payload
+        if run == len(separated_payload) - 1:
+            # transmission_number = LASTZ
+            # 0 if not the last
+            # 1 if the last
+            transmission_number = "1"
+        else:
+            # transmission_number = LASTZ
+            # 0 if not the last
+            # 1 if the last
+            transmission_number = "0"
+        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
+        data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload
+        # encoding the data packet
+        data_packet = data_packet.encode() 
+        print(data_packet)
 
 
             try:
