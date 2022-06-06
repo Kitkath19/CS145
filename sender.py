@@ -37,7 +37,8 @@ def RTT_estimation():
 
 def PARAMETER_estimation():
     # declaration of global variables
-    global remaining_packets, time_taken, last_accepted_payload_size, payload_size, payload, limitation, remaining_size, TimeoutInterval, target_time, time_elapsed
+    global time_elapsed, remaining_size, payload_size, target_time, time_taken, remaining_packets, TimeoutInterval
+    global last_accepted_payload_size, limitation
     # timer for end of initiation -> per transaction to get time elapsed
     end_time = time.time()     
     # time elapsed
@@ -51,16 +52,16 @@ def PARAMETER_estimation():
         target_time = 120
     # computing for time taken
     time_taken = (remaining_packets * TimeoutInterval) + time_elapsed
+
     # remaining packets to be sent
-    remaining_packets = math.floor((target_time - time_elapsed) / TimeoutInterval)
-    
+    remaining_packets = math.ceil((target_time - time_elapsed) / TimeoutInterval)
     if target_time < time_taken:
         payload_size = max(math.ceil(remaining_size / remaining_packets), last_accepted_payload_size + 1)
 
-    if payload_size < limitation: 
-        payload_size = payload_size
-    else:
-        payload_size = limitation - 1
+        if payload_size < limitation: 
+            payload_size = payload_size
+        else:
+            payload_size = limitation - 1
 
 
 # Step 3.3: Continuing the program
@@ -68,7 +69,7 @@ def PARAMETER_estimation():
 # number of runs done
 run = 1
 def STEP_3_3():
-    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, TimeoutInterval, start_time, run, SampleRTT
+    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
     global last_accepted_payload_size, time_taken, limitation, time_elapsed
     # separating the contents -> list format
     separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
@@ -204,8 +205,6 @@ args = parser.parse_args()
 # 2.1   Intent Message IDwwwwwwww
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
-# timer for start of initiation
-start_time = time.time()
 # setting up the intent message of format : ID + unique_iID
 intent_message = f"ID{args.unique_ID}".encode()
 # 2.2   Accept Message YYYYYYY
@@ -220,6 +219,8 @@ sock.bind(('', args.port_sender))
 sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
 acknowledgement, __ = sock.recvfrom(1024)
+# timer for start of initiation
+start_time = time.time()
 # decode acknowledgement number
 trasaction_ID = acknowledgement.decode()
 print(trasaction_ID)
@@ -256,12 +257,12 @@ else:
     first_packet = payload[:1]
     # send command
     # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
-    data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet
-    # timer for start of initiation
-    RTT_start_time = time.time()     
+    data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet   
     # encoding the data packet
     data_packet = data_packet.encode()
     print(data_packet)
+    # timer for start of initiation
+    RTT_start_time = time.time()  
     # using the intent message from 2.1 send data to address
     sock.sendto(data_packet, (args.IP_address, args.port_receiver))
     # store the acknowledgement number from port
