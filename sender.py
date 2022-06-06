@@ -1,312 +1,429 @@
-import socket
-import sys
-import argparse
-import time
 import math
+import time
+import requests
+import socket
+import argparse
+import hashlib
+
+PID = "2099fba5"            # Fill in your PID
+SENDER_PORT = 6679  # Fill in your Port Number
+
+'''
+Parse Arguments Function
+---
+This function parses the arguments passed to the program and returns them as a dictionary.
+
+FLAGS:
+? -f, --file, the path directory of the file to send
+? -a, --address, the address of the server
+? -s, --receiver_port, the port number used by the receiver
+? -c, --sender_port, the port number used by the sender
+? -i, --id, the unique identifier
+? -t, --tests, the number of tests to be used
+? -d, --debug, the debug flag
+
+'''
 
 
-# the formula for this function was retrieved from lecture 11
-def RTT_estimation():
-# declaration of global variables
-    global EstimatedRTT, DevRTT, TimeoutInterval, SampleRTT
-    # part 1 - estimated RTT computation
-    # check if this is the initial transactiom
-    # if it is the initial
-    if EstimatedRTT == 0:
-    # set EstimatedRTT = RTT
-    # the RTT was computed previously  RTT = (RTT_end_time - RTT_start_time)
-        EstimatedRTT = SampleRTT
-    # if it is not the initial
-    else:
-    # Lecture 11 page 18
-    # “Average” of SampleRTT values must be taken; in TCP, this is called EstimatedRTT
-    # EstimatedRTT updated for each new value of SampleRTT
-        EstimatedRTT = (1 - 0.125) * EstimatedRTT + 0.125 * SampleRTT
-
-    # part 2 - dev RTT computation
-    # Lecture 11 page 19
-    # DevRTT - estimate of how much SampleRTT typically varies from EstimatedRTT
-    DevRTT = (1 - 0.25) * DevRTT + 0.25 * abs(SampleRTT - EstimatedRTT)
-
-    # part 3 - rate update
-    # Lecture 11 page 20
-    # From the EstimatedRTT and DevRTT, the timeout interval is derived
-    TimeoutInterval = EstimatedRTT + (4 * DevRTT)
+def parseArguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--file", type=str,
+                        help="File to send", default=f"{PID}.txt")
+    parser.add_argument("-a", "--address", type=str,
+                        help="Server IP address",  default="10.0.7.141")
+    parser.add_argument("-s", "--receiver_port", type=int,
+                        help="Port number used by the receiver", default=SENDER_PORT)
+    parser.add_argument("-c", "--sender_port", type=int,
+                        help="Port number used by the sender", default=9000)
+    parser.add_argument("-i", "--id", type=str,
+                        help="Unique Identifier", default=PID)
+    parser.add_argument("-t", "--tests", type=int,
+                        help="Number of tests", default=1)
+    parser.add_argument("-d", "--debug", type=bool,
+                        help="Toggle debug mode", default=False)
+    args = parser.parse_args()
+    return args
 
 
+'''
+Download Package Function
+---
+This method downloads the package from the server.
+? This method would only be used in debug mode for automating the testing process.
+'''
 
-def PARAMETER_estimation():
-    # declaration of global variables
-    global time_elapsed, remaining_size, payload_size, target_time, time_taken, remaining_packets, TimeoutInterval
-    global last_accepted_payload_size, limitation
-    # timer for end of initiation -> per transaction to get time elapsed
-    end_time = time.time()     
-    # time elapsed
-    time_elapsed = (end_time - start_time)
-    # remaining packets to be sent
-    # remaining_packets = (95 - time_elapsed) / TimeoutInterval
-    remaining_packets = math.ceil(remaining_size / payload_size)
-    if time_elapsed < target_time:
-        target_time = target_time
-    else:
-        target_time = 120
-    # computing for time taken
-    time_taken = (remaining_packets * TimeoutInterval) + time_elapsed
 
-    # remaining packets to be sent
-    remaining_packets = math.ceil((target_time - time_elapsed) / TimeoutInterval)
-    if target_time < time_taken:
-        payload_size = max(math.ceil(remaining_size / remaining_packets), last_accepted_payload_size + 1)
+def downloadPackage(file):
+    URL = f"http://3.0.248.41:5000/get_data?student_id={PID}"
+    response = requests.get(URL)
+    open(file, "wb").write(response.content)
 
-        if payload_size < limitation: 
-            payload_size = payload_size
+
+'''
+Colors Class
+---
+This a helper class used to print colored text for debugging.
+? Class will only be used if the debug flag is active
+'''
+
+
+class colors:
+    TOP = '\033[95m'
+    ACK = '\033[92m'
+    NON = '\033[93m'
+    ERR = '\033[91m'
+    END = '\033[0m'
+    INF = '\033[94m'
+    EMP = '\033[1m'
+
+
+'''
+Sender Class
+---
+This class contains all the methods used in the UDP connection with the server.
+'''
+
+
+class Sender:
+    '''
+    Initialize Method
+    ---
+    This method initializes the UDP connection with the server with the command liine arguments provided.
+    '''
+
+    def __init__(self, args) -> None:
+        self.PID = PID
+        self.SENDER_PORT = SENDER_PORT
+        self.FILE_NAME = args.file
+        self.SENDER_PORT_NO = args.sender_port
+        self.RECEIVER_PORT_NO = args.receiver_port
+        self.IP_ADDRESS = args.address
+        self.debug = args.debug
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind(('', self.RECEIVER_PORT_NO))
+
+    '''
+    Send Intent Message Method
+    ---
+    This method sends the intent message to the server and receives a transaction ID as a response.
+    The transaction ID will be saved to the class variables.
+    '''
+
+    def sendIntentMessage(self):
+        intent = f"ID{self.PID}".encode()
+        self.sock.sendto(intent, (self.IP_ADDRESS, self.SENDER_PORT_NO))
+        data, _ = self.sock.recvfrom(self.RECEIVER_PORT_NO)
+        self.timer = time.time()
+        self.TID = data.decode()
+
+    '''
+    Send Package Method
+    ---
+    This method sends the package to the server.
+
+    VARIABLES:
+    ? self.file - the file to be sent
+    ? self.data - the data to be sent
+    ? self.length - the length of the data
+    ? self.size - the size parameter of the sender
+    ? self.seq - the sequence number of the package
+    ? self.last - the last successful size parameter
+    ? self.limit - the maximum size parameter
+    ? self.elapsed - the time elapsed from establishing an intent message
+    ? self.success - determines if the package was successfully sent
+    ? self.target - the time limit for the sender
+    ? self.status - used for printing to console, only used on debug mode
+    ? self.output - used for printing to console, only used on debug mode
+    ? self.eta - the expected time of arrival of the package to the receiver
+    ? self.estimatedRTT - the estimated round trip time
+    ? self.devRTT - the deviation of the estimated round trip time
+    '''
+
+    def sendPackage(self):
+        self.file = open(f"{self.PID}.txt", "r")
+        self.data = self.file.read()
+        self.length = len(self.data)
+        self.sent = 0
+        self.size = 1
+        self.rate = 0
+        self.seq = 0
+        self.last = 0
+        self.limit = self.length
+        self.elapsed = 0
+        self.success = False
+        self.target = 95
+        self.status = None
+        self.output = ""
+        self.eta = 0
+        self.estimatedRTT = 0
+        self.devRTT = 0
+
+        # This line prints the TID and the length of the data to be sent in the terminal if in debug mode.
+        if self.debug:
+            print(
+                f"TID: {colors.INF}{colors.EMP}{self.TID}{colors.END} | LENGTH: {self.length}")
+
+        # This line sets the initial timeout to 120s.
+        self.sock.settimeout(120)
+
+        while True:
+            if self.checkGuard():
+                break
+
+            '''
+            seqID   - the sequence number of the packet
+            isLast  - determines if this is the last packet of the file to be sent
+            packet  - the string of the message to be sent to the server
+            '''
+            seqID = f"{self.seq}".zfill(7)
+            isLast = 1 if self.sent + self.size >= self.length else 0
+            packet = f"ID{self.PID}SN{seqID}TXN{self.TID}LAST{isLast}{self.data[self.sent:self.sent+self.size]}"
+
+            # Sender will send the packet to the server.
+            self.sock.sendto(
+                packet.encode(), (self.IP_ADDRESS, self.SENDER_PORT_NO))
+
+            # Starts the timer for the sender to calculate the RTT of the packet.
+            self.initial = time.time()
+
+            # Using try catch to catch the timeout exception.
+            try:
+                '''
+                Get a reply from the server. if reply doesn't come within the set timeout, the timeout exception will be raised.
+                Otherwise, the decoded reply will be saved to the variable ack.
+                '''
+                reply, _ = self.sock.recvfrom(self.RECEIVER_PORT_NO)
+                ack = reply.decode()
+
+                '''
+                Updates the parameters of the sender.
+                '''
+                self.updateParameters()
+
+                '''
+                Verify the ack received from the server and reflect the status of the packet to the output variable.
+                '''
+                if self.verifyAck(seqID, ack, packet):
+                    self.output = f"[ {colors.TOP}{seqID}{colors.END} ] : {colors.ACK}ACK | ETA: {self.eta:6.2f}s | LEN: {self.last:2} | LIM: {self.limit:4} | RTT: {time.time() - self.initial:5.2f} | RAT: {self.rate:5.2f} | COM: {self.sent}/{self.length}{colors.END}"
+                else:
+                    self.output = f"[ {colors.TOP}{seqID}{colors.END} ] : {colors.ERR}ERR | ETA: {self.eta:6.2f}s | LEN: {self.last:2} | LIM: {self.limit:4} | RTT: {time.time() - self.initial:5.2f} | RAT: {self.rate:5.2f} | COM: {self.sent}/{self.length}{colors.END}"
+
+            # Raise an exception if the timeout is reached.
+            except socket.timeout:
+                # Compute for the remaining packets to recalibrate the eta.
+                rem_packets = math.ceil((self.length - self.sent) / self.size)
+                self.eta = self.elapsed + self.rate + rem_packets * self.rate
+
+                # Set the limit to the current size if size is not the last successful attempt.
+                self.limit = self.size if self.size != self.last else self.length
+
+                # Set the output variable to reflect the timeout.
+                self.output = f"[ {colors.TOP}{seqID}{colors.END} ] : {colors.NON}NON | ETA: {self.eta:6.2f}s | LEN: {self.size:2} | LIM: {self.limit:4} | RTT: {time.time() - self.initial:5.2f} | RAT: {self.rate:5.2f} | COM: {self.sent}/{self.length}{colors.END}"
+
+                # Decrement the value of the size parameter
+                self.size -= 1
+                # Finally, sets the size to whichever is greater, the last ack'ed size or the size obtained from the previous line.
+                self.size = max(self.size, self.last)
+
+            # Print the output variable to the terminal.
+            finally:
+                if self.debug:
+                    print(self.output)
+
+    '''
+    Check Guard Method
+    ---
+    This method checks if the sender has reached the end of the file or has used up the allocated transaction time.
+    Returns true if either is satisfied. 
+    '''
+
+    def checkGuard(self):
+        self.elapsed = time.time() - self.timer
+        if self.elapsed > 120:
+            return True
+
+        if self.sent >= self.length:
+            self.success = True
+            return True
+
+    '''
+    Update Parameters Method
+    ---
+    This method updates the parameters of the sender.
+    '''
+
+    def updateParameters(self):
+        self.updateRate()
+        self.updateSent()
+        self.updateETA()
+        self.updateSize()
+
+    '''
+    Update Sent Method
+    ---
+    This method updates the sent, last, and seq variables of the sender class.
+
+    Changes:
+    ---
+    ? self.sent - added with the current size since packet was ACKed.
+    ? self.last - set to the current size since packet was ACKed.
+    ? self.seq  - incremented by 1 since packet was ACKed.
+    '''
+
+    def updateSent(self):
+        self.sent += self.size
+        self.last = self.size
+        self.seq += 1
+
+    '''
+    Update ETA Method
+    ---
+    This method updates the eta parameter of the sender.
+
+    Computation:
+    ---
+    ? 1. Get the elapsed time from the initial time of initiating the transaction.
+    ? 2. Check if elapsed time is greater than the target time (90s). If so, set the elapsed time to the allocated time(120s).
+    ? 3. Get the remaining data left by subtracting the initial data length with the sent data length.
+    ? 4. Get the remaining packets left by dividing the remaining data by the size of the packet.
+    ? 5. Get the ETA by adding the elapsed time with the remaining packets multiplied by the rate of the packet.
+    '''
+
+    def updateETA(self):
+        self.elapsed = time.time() - self.timer
+        self.target = self.target if self.elapsed < self.target else 120
+        rem_data = self.length - self.sent
+        rem_packets = math.ceil(rem_data / self.size)
+        self.eta = self.elapsed + (rem_packets * self.rate)
+
+    '''
+    Update Rate Method
+    ---
+    This method updates the rate of the sender.
+
+    Computation:
+    ---
+    This is an implementation of the Exponential Weighted Moving Average at Lec 11.
+
+    ? 1. Get the sample RTT by subtracting the initial time from the current time.
+    ? 2. Get the estimated RTT by using the formula at Lec 11 slide #18.
+    ? 3. Get the deviation of the estimated RTT by using the formula at Lec 11 slide #19.
+    ? 4. Update the rate by using the formula at Lec 11 slide #20.
+    '''
+
+    def updateRate(self):
+        alpha = 0.125
+        beta = 0.25
+        sampleRTT = time.time() - self.initial
+
+        if self.estimatedRTT == 0:
+            self.estimatedRTT = sampleRTT
         else:
-            payload_size = limitation - 1
+            self.estimatedRTT = (1 - alpha)*self.estimatedRTT + alpha*sampleRTT
+
+        self.devRTT = (1 - beta)*self.devRTT + beta * \
+            abs(sampleRTT - self.estimatedRTT)
+
+        self.rate = self.estimatedRTT + 4*self.devRTT
+        if self.rate != 0:
+            self.sock.settimeout(math.ceil(self.rate))
+
+    '''
+    Update Size Method
+    ---
+    This method updates the size of the packet to be sent.
+
+    Computation:
+    ---
+    ? 1. Get the remaining time left to achieve the target time. Do this by subtracting the target time to the time elapsed.
+    ? 2. Get the remaining data left to send. Do this by subtracting the initial data length with the sent data length.
+    ? 3. Get the remaining packets to be sent. Do this by dividing the remaining time by the rate.
+    ? 4. Check if the eta is greater than the target time.
+    ?    - If it is, set size to whichever is greater, the remaining packets times the rate or, the last successful ack incremented by one.
+    ?    - Then, check if the size is greater than the limit.
+    ?    - If it is, set the size to the limit subtracted by 1.
+    '''
+
+    def updateSize(self):
+        rem_time = self.target - self.elapsed
+        rem_data = self.length - self.sent
+        rem_packets = math.floor(rem_time/self.rate)
+        if self.eta > self.target:
+            self.size = max(math.ceil(rem_data / rem_packets), self.last + 1)
+            self.size = self.size if self.size < self.limit else self.limit - 1
+
+    '''
+    Verify ACK Method
+    ---
+    This method will verify the ack received from the server by comparing the supposed md5 hash of the ACK with the correct md5 hash of the packet.
+
+    Computation:
+    ---
+    ? 1. Compute the expected Checksum by using the function provided in the project specs.
+    ? 2. Determine the right ACK to be received from the server by using the formatting provided in the project specs.
+    ? 3. Check if the received checksum is equal to the expected checksum.
+    '''
+
+    def verifyAck(self, seqID, ack, packet):
+        md5 = self.computeChecksum(packet)
+        correct = f"ACK{seqID}TXN{self.TID}MD5{md5}"
+        return ack == correct
+
+    '''
+    Compute Checksum Method
+    ---
+    This method will compute the checksum of the packet and is provided in the project specs.
+    '''
+
+    def computeChecksum(self, packet):
+        return hashlib.md5(packet.encode('utf-8')).hexdigest()
+
+    '''
+    Wait End Method
+    ---
+    This method will wait for the end of the allocated time for the transaction to end.
+    '''
+
+    def waitEnd(self):
+        while True:
+            remaining = 130 - (time.time() - self.timer)
+            if remaining <= 0:
+                break
+        print("Transaction closed.")
+        self.file.close()
+
+    '''
+    Log Method
+    ---
+    This method will log the transaction results to the log file.
+    
+    Variables:
+    ? Color variable - is used for coloring the outputs whether it passes the 95s mark or 120s mark.
+    ? Code variable  - is used for coloring the outputs for whether the packet was successfully sent or not.
+    ? self.status    - SUCCESS or FAIL. Used for printing to console, only used on debug mode
+    ? self.result    - Transaction result is used for printing to console, only used on debug mode
+    '''
+
+    def log(self):
+        self.elapsed = time.time() - self.timer
+        color = colors.ACK if self.elapsed < 95 else colors.NON if self.elapsed < 120 else colors.ERR
+        code = colors.ACK if self.success else colors.ERR
+        status = 'SUCCESS' if self.success else 'FAIL'
+        result = f"| {colors.INF}{colors.EMP}{self.TID}{colors.END} | {code}{status.center(7)}{colors.END} | {color}{self.elapsed:6.2f}{colors.END} |"
+        print(result)
+        open("log.txt", "a").write(f"{result}\n")
 
 
-# Step 3.3: Continuing the program
-# function was used to make the code faster
-# number of runs done
-run = 1
-def STEP_3_3():
-    global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
-    global last_accepted_payload_size, time_taken, limitation, time_elapsed
-    # separating the contents -> list format
-    separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
-    print(separated_payload)
-    # sending of details to server
-    for i in range(len(separated_payload)):
-        #print(separated_payload[i])
-        # sequence_number = SNXXXXXXX
-        # always starts at 0
-        sequence_number = str(run)
-        # checking if last payload
-        if i == len(separated_payload) - 1:
-            # transmission_number = LASTZ
-            # 0 if not the last
-            # 1 if the last
-            transmission_number = "1"
+if __name__ == "__main__":
+    args = parseArguments()
+    sender = Sender(args)
+    for i in range(args.tests):
+        if args.tests > 1:
+            downloadPackage(args.file)
+        sender.sendIntentMessage()
+        if sender.TID != "Existing alive transaction":
+            sender.sendPackage()
+            sender.log()
+            sender.waitEnd()
         else:
-            # transmission_number = LASTZ
-            # 0 if not the last
-            # 1 if the last
-            transmission_number = "0"
-        # intent_message + sequence_number + trasaction_ID + transmission_number + separated_payload
-        data_packet = intent_message + "SN" + sequence_number.zfill(7) + trasaction_ID + "LAST" + transmission_number + separated_payload[i]
-        # encoding the data packet
-        data_packet = data_packet.encode() 
-        print(data_packet)
-
-        
-        # timeout interval will be used in settimeout for each packet
-        if TimeoutInterval != 0:
-            sock.settimeout(math.ceil(int(TimeoutInterval)))
-
-        try:
-            # using the intent message from 2.1 send data to address
-            sock.sendto(data_packet, (args.IP_address, args.port_receiver))
-            # timer for start of initiation
-            RTT_start_time = time.time() 
-            # store the acknowledgement number from port
-            acknowledgement_final, _ = sock.recvfrom(1024)
-            # decode acknowledgement number
-            acknowledgement_final = acknowledgement_final.decode()
-            # print output
-            print(acknowledgement_final)
-
-            # timer for end of initiation -> 1st ACK printed out (part 2.2)
-            RTT_end_time = time.time()
-            # computing for the payload size (RTT)
-            SampleRTT = (RTT_end_time - RTT_start_time)
-            RTT_estimation()
-
-            # for each successful upload run is incremented
-            run += 1
-
-            # update remaining size
-            remaining_size = remaining_size - payload_size
-            last_accepted_payload_size = payload_size
-            # remaining packets to be sent
-            payload = payload[int(payload_size):]
-            PARAMETER_estimation()
-            # print(remaining_size)
-            
-
-        except socket.timeout:
-            # remaining packets to be sent
-            # remaining_packets = (95 - time_elapsed) / TimeoutInterval
-            remaining_packets = math.ceil(remaining_size / payload_size)
-            # computing for time taken
-            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
-
-            if payload_size != last_accepted_payload_size: 
-                limitation = payload_size
-            else:
-                limitation = len(payload)   
-
-            # print(payload)
-            payload_size -=1
-            payload_size = max( payload_size, last_accepted_payload_size)
-            # repeat setep 3_3
-            return STEP_3_3()
-
-
-
-
-#declaration of variables that will be used throughout the code
-#global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID, intent_message
-
-
-# STEP 0: Getting the Command Line Input
-# angparse was used so that there can be blank parts
-# blank parts will be replaced by the default value/s
-# declaration of the use of parser
-parser = argparse.ArgumentParser(description='Project Input Parameters.')
-# adding of argument 1: -f denoting Filename of the Payload
-# type is str
-# default value is your_id.txt in my case your_id = 2099fba5
-parser.add_argument("-f", "--filename_payload", type=str,
-                    help="Filename of the Payload", default=f"2099fba5.txt")
-# adding of argument 2: -a denoting IP address of the Receiver
-# type is str
-# default value is 10.0.7.141 (given in project specifications)                   
-parser.add_argument("-a", "--IP_address", type=str,
-                    help="IP address of the Receiver",  default="10.0.7.141")
-# adding of argument 3: -s denoting Port number used by the receiver
-# type is int
-# default value is is your assigned port, in my case is 6679                    
-parser.add_argument("-s", "--port_receiver", type=int,
-                    help="Port number used by the receiver", default=6679)
-# adding of argument 4: -c denoting Port number used by the sender
-# type is int
-# default value is 9000 (given in project specifications)                   
-parser.add_argument("-c", "--port_sender", type=int,
-                    help="Port number used by the sender", default=9000)
-# adding of argument 5: -i denoting Unique ID
-# type is str
-# default value is your_id.txt in my case your_id = 2099fba5                    
-parser.add_argument("-i", "--unique_ID", type=str,
-                    help="Unique ID", default='2099fba5')
-args = parser.parse_args()
-
-
-
-# STEP 1: Dowloading Payload
-# Transaction Generation/Results Server (TGRS)
-# http://3.0.248.41:5000/get_data?student_id = wwwwwwww
-# wwwwwww is the unique ID given in the email
-# unique ID given/default: 2099fba5
-# TGRS = f"http://3.0.248.41:5000/get_data?student_id={args.unique_ID}"
-# note that: this is NOT needed since the payload must be uploaded before running the program
-# as stated in the project specifications
-
-
-# STEP 2: Initiating a Transaction
-# 2.1   Intent Message IDwwwwwwww
-# wwwwwwww is the unique ID given in the email
-# default unique_ID = "2099fba5"
-# setting up the intent message of format : ID + unique_iID
-intent_message = f"ID{args.unique_ID}".encode()
-# 2.2   Accept Message YYYYYYY
-# accept message will be printed out once it is proven 
-# that there is no alive transaction after doing 2.1
-# YYYYYYY is the transaction id that allows the user to check if the transmission is valid
-# socket initialization
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# bind socket address to port receiver
-sock.bind(('', args.port_sender))
-# using the intent message from 2.1 send data to address
-sock.sendto(intent_message, (args.IP_address, args.port_receiver))
-# store the acknowledgement number from port
-acknowledgement, __ = sock.recvfrom(1024)
-# timer for start of initiation
-start_time = time.time()
-# decode acknowledgement number
-trasaction_ID = acknowledgement.decode()
-print(trasaction_ID)
-
-
-
-# Step 2.5: Checking if there is an existing transaction
-# check if transaction ID says that there is an alive tranaction
-if trasaction_ID == "Existing alive transaction":
-# if there is print Existing alive transaction 
-    print(trasaction_ID)
-# if no live tranaction
-# continue on step 3
-else:
-    # Step 3: Sending the Payload
-    # sending the data packets
-    # intent_message = IDWWWWWWWW
-    # retrieve intent_message from PART 2 (un)code it
-    intent_message = intent_message.decode()
-    # transaction_ID = TXNYYYYYYY
-    trasaction_ID = "TXN" + str(trasaction_ID) 
-    # file_contents = PAYLOAD
-    # open file using the path in input
-    # r so that contents can be copied
-    file = open(args.filename_payload, "r")
-    # save file contents
-    payload = str(file.read())
-    payload = payload.rstrip()
-    
-
-    # STEP 3.1: Initial Transaction
-    # send first packet with size 1 to get rate
-    # get first initial letter in string
-    first_packet = payload[:1]
-    # send command
-    # intent_message + sequence_number + trasaction_ID + transmission_number + first_packet
-    data_packet = intent_message + "SN0000000" + trasaction_ID + "LAST0" + first_packet   
-    # encoding the data packet
-    data_packet = data_packet.encode()
-    print(data_packet)
-    # timer for start of initiation
-    RTT_start_time = time.time()  
-    # using the intent message from 2.1 send data to address
-    sock.sendto(data_packet, (args.IP_address, args.port_receiver))
-    # store the acknowledgement number from port
-    acknowledgement_final, _ = sock.recvfrom(1024)
-    # decode acknowledgement number
-    acknowledgement_final = acknowledgement_final.decode()
-    print(acknowledgement_final)
-
-
-    # Step 3.2.1: Computing for the rate
-    # timer for end of initiation -> 1st ACK printed out (part 2.2)
-    RTT_end_time = time.time()
-    # computing for the payload size (RTT)
-    SampleRTT = (RTT_end_time - RTT_start_time)
-    #print(RTT)
-    # set initial EstimatedRTT to 0
-    # since no transaction/runs were made
-    EstimatedRTT = 0
-    # set initial TimeoutInterval to 0
-    # since no transaction/runs were made
-    TimeoutInterval = 0
-    # set initial DevRTT to 0
-    # since no transaction/runs were made
-    DevRTT = 0
-    # set initial last payload size to 0
-    # since no transaction/runs were made
-    RTT_estimation()
-    
-    # Step 3.2.2: parameter estimation
-    remaining_size = len(payload) - 1
-    remaining_packets = 0
-    time_taken = 0
-    last_accepted_payload_size = 1
-    payload_size = 1
-    limitation = len(payload)
-    time_elapsed = 0
-    target_time = 95
-    PARAMETER_estimation()
-    # computing for the payload size
-    #payload_size = math.floor(remaining_size / remaining_packets)
-    # remove first packet from original payload
-    payload = payload[1:]
-
-
-    # Step 3.3: Continuing the program
-    # separating the contents -> list format
-    STEP_3_3()
+            print("Existing alive transaction")
