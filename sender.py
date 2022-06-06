@@ -10,7 +10,7 @@ def STEP_3():
     # declaration of global variables to be used in this function
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
     global last_accepted_payload_size, time_taken, limitation, time_elapsed, original, sent_packets
-    global EstimatedRTT, DevRTT, TimeoutInterval, SampleRTT
+    global EstimatedRTT, DevRTT, TimeoutInterval, SampleRTT, target_time
     # checking if the length of sent packets is less than the original packet length
     while sent_packets <= original:
 
