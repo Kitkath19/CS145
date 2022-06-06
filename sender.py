@@ -21,7 +21,7 @@ def RTT_estimation():
     # Lecture 11 page 18
     # “Average” of SampleRTT values must be taken; in TCP, this is called EstimatedRTT
     # EstimatedRTT updated for each new value of SampleRTT
-        EstimatedRTT = (1 - 0.125) * EstimatedRTT + 0.125 * SampleRTT
+        EstimatedRTT = (1 - 0.125) * EstimatedRTT + (0.125 * SampleRTT)
 
     # part 2 - dev RTT computation
     # Lecture 11 page 19
@@ -32,10 +32,9 @@ def RTT_estimation():
     # Lecture 11 page 20
     # From the EstimatedRTT and DevRTT, the timeout interval is derived
     TimeoutInterval = EstimatedRTT + (4 * DevRTT)
+    print("Timeout:" + TimeoutInterval)
 
-    # timeout interval will be used in settimeout for each packet
-    if TimeoutInterval != 0:
-        sock.settimeout(math.ceil(TimeoutInterval))
+    
 
 
 
@@ -49,17 +48,21 @@ def PARAMETER_estimation():
         #run += 1
 
     time_elapsed = time.time() - start_time
-    #target_time = target_time if time_elapsed < target_time else 120
+    target_time = target_time if time_elapsed < target_time else 120
     rem_data = original - sent_packets
     rem_packets = math.ceil(rem_data / payload_size)
     time_taken = time_elapsed + (rem_packets * TimeoutInterval)
 
-    rem_time = 95 - time_elapsed
+    rem_time = target_time - time_elapsed
     rem_data = original - sent_packets
     rem_packets = math.floor(rem_time/TimeoutInterval)
-    if time_taken > 95:
+    print("rem_time:" + rem_time)
+    print("rem_data:" + rem_data)
+    print("rem_packets:" + rem_packets)
+    if time_taken > target_time:
         payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
-        #payload_size = payload_size if payload_size < limitation else limitation - 1
+        payload_size = payload_size if payload_size < limitation else limitation - 1
+    print("payload_size:" + payload_size)
 
 
 # Step 3.3: Continuing the program
@@ -113,6 +116,9 @@ def STEP_3_3():
             # computing for the payload size (RTT)
             SampleRTT = (RTT_end_time - RTT_start_time)
             RTT_estimation()
+            # timeout interval will be used in settimeout for each packet
+            if TimeoutInterval != 0:
+                sock.settimeout(math.ceil(TimeoutInterval))
 
             # for each successful upload run is incremented
             run += 1
