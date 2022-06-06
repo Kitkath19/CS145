@@ -14,7 +14,6 @@ def STEP_3_3():
     separated_payload = [payload[i:i+int(payload_size)] for i in range(0, len(payload), int(payload_size))]
     print(separated_payload)
     # number of runs done
-
     # sending of details to server
     for i in range(len(separated_payload)):
         #print(separated_payload[i])
@@ -53,6 +52,7 @@ def STEP_3_3():
             # print output
             print(acknowledgement_final)
             updated_payload = updated_payload + payload_size
+            payload = payload[updated_payload:]
             # timer for end of initiation -> 1st ACK printed out (part 2.2)
             #RTT_end_time = time.time()
             # timer for end of initiation -> per transaction to get time elapsed
@@ -73,7 +73,6 @@ def STEP_3_3():
 
         except:
             payload_size = (1 + payload_size) / 2
-            payload = payload[updated_payload:]
                 # repeat setep 3_3
             return STEP_3_3()
 
