@@ -9,26 +9,26 @@ the sender to reach the receiver of the test server. The program is created in P
 
 
 # Files Included
-  sender.py - sender code to be used throughout the project
-    command: python3 sender.py -f /home/ubuntu/CS145/2099fba5.txt -a 10.0.7.141 -s 9000 -c 6679 -i 2099fba5 
-  packet_tracing.py - Wireshark/Tshark tracefile generator used in the project
-    command: python3 packet_tracing.py
+- sender.py - sender code to be used throughout the project
+  - command: python3 sender.py -f /home/ubuntu/CS145/2099fba5.txt -a 10.0.7.141 -s 9000 -c 6679 -i 2099fba5 
+- packet_tracing.py - Wireshark/Tshark tracefile generator used in the project
+  - command: python3 packet_tracing.py
   
   
 # Project Implementation
 
 1. Open 2 (two) terminals
-- Terminal A: running the sender code
-- Terminal B: running the packet tracing code (wireshark/tshark)
+  - Terminal A: running the sender code
+  - Terminal B: running the packet tracing code (wireshark/tshark)
 2. Connect to the AWS serve
-- SSH in the terminal using the command: ssh -i "<key>" ubuntu@<PUBLIC IP address>
-- in my case it is: ssh -i "kdlc.pem" ubuntu@<PUBLIC IP address>
-(3) Connect to GitHub
+  - SSH in the terminal using the command: ssh -i "<key>" ubuntu@<PUBLIC IP address>
+  - in my case it is: ssh -i "kdlc.pem" ubuntu@<PUBLIC IP address>
+3. Connect to GitHub
   - once connected always do a "git pull" to update the files in the current directory
-(4) Download the Payload
+4. Download the Payload
   - for each run a new payload must be generated
   - link: http://3.0.248.41:5000/get_data?student_id=2099fba5
-(5) Update the 2099fba5.txt file in GitHub
+5. Update the 2099fba5.txt file in GitHub
   - once updated type in "git pull" in one of the terminals
   - you are ready to implement the project
 (6) Send in the command to Terminal B first, make sure you do this first
