@@ -16,10 +16,11 @@ the sender to reach the receiver of the test server. The program is created in P
   
   
 # Project Implementation
-(1) Open 2 (two) terminals
+<ol>
+<li>Open 2 (two) terminals</li>
   - Terminal A: running the sender code
   - Terminal B: running the packet tracing code (wireshark/tshark)
-(2) Connect to the AWS server
+<li>Connect to the AWS server</li>
   - SSH in the terminal using the command: ssh -i "<key>" ubuntu@<PUBLIC IP address>
     in my case it is: ssh -i "kdlc.pem" ubuntu@<PUBLIC IP address>
 (3) Connect to GitHub
