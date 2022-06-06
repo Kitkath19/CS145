@@ -220,7 +220,7 @@ sock.bind(('', args.port_sender))
 # using the intent message from 2.1 send data to address
 sock.sendto(intent_message, (args.IP_address, args.port_receiver))
 # store the acknowledgement number from port
-acknowledgement, __ = sock.recvfrom(1024)
+acknowledgement, __ = sock.recvfrom(args.port_receiver)
 # timer for start of initiation
 start_time = time.time()
 # decode acknowledgement number
