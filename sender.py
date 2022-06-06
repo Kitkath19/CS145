@@ -97,51 +97,51 @@ def STEP_3_3():
         print(data_packet)
 
 
-            try:
-                # using the intent message from 2.1 send data to address
-                sock.sendto(data_packet, (args.IP_address, args.port_receiver))
-                # timer for start of initiation
-                RTT_start_time = time.time() 
-                # store the acknowledgement number from port
-                acknowledgement_final, _ = sock.recvfrom(1024)
-                # decode acknowledgement number
-                acknowledgement_final = acknowledgement_final.decode()
-                # print output
-                print(acknowledgement_final)
+        try:
+            # using the intent message from 2.1 send data to address
+            sock.sendto(data_packet, (args.IP_address, args.port_receiver))
+            # timer for start of initiation
+            RTT_start_time = time.time() 
+            # store the acknowledgement number from port
+            acknowledgement_final, _ = sock.recvfrom(1024)
+            # decode acknowledgement number
+            acknowledgement_final = acknowledgement_final.decode()
+            # print output
+            print(acknowledgement_final)
 
-                # timer for end of initiation -> 1st ACK printed out (part 2.2)
-                RTT_end_time = time.time()
-                # computing for the payload size (RTT)
-                SampleRTT = (RTT_end_time - RTT_start_time)
-                RTT_estimation()
+            # timer for end of initiation -> 1st ACK printed out (part 2.2)
+            RTT_end_time = time.time()
+            # computing for the payload size (RTT)
+            SampleRTT = (RTT_end_time - RTT_start_time)
+            RTT_estimation()
 
-                # for each successful upload run is incremented
-                run += 1
+            # for each successful upload run is incremented
+            run += 1
 
-                # update remaining size
-                remaining_size = remaining_size - payload_size
-                last_accepted_payload_size = payload_size
-                # remaining packets to be sent
-                payload = payload[int(payload_size):]
-                PARAMETER_estimation()
-                # print(remaining_size)
-                
+            # update remaining size
+            remaining_size = remaining_size - payload_size
+            last_accepted_payload_size = payload_size
+            # remaining packets to be sent
+            payload = payload[int(payload_size):]
+            PARAMETER_estimation()
+            # print(remaining_size)
+            
 
-            except socket.timeout:
-                # remaining packets to be sent
-                # remaining_packets = (95 - time_elapsed) / TimeoutInterval
-                remaining_packets = math.ceil(original - sent_packets / payload_size)
-                # computing for time taken
-                time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
+        except socket.timeout:
+            # remaining packets to be sent
+            # remaining_packets = (95 - time_elapsed) / TimeoutInterval
+            remaining_packets = math.ceil(original - sent_packets / payload_size)
+            # computing for time taken
+            time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
 
-                if payload_size != last_accepted_payload_size: 
-                    limitation = payload_size
-                else:
-                    limitation = len(payload)   
+            if payload_size != last_accepted_payload_size: 
+                limitation = payload_size
+            else:
+                limitation = len(payload)   
 
-                payload_size = max(payload_size - 1, last_accepted_payload_size)
-                # repeat setep 3_3
-                return STEP_3_3()
+            payload_size = max(payload_size - 1, last_accepted_payload_size)
+            # repeat setep 3_3
+            return STEP_3_3()
 
 
 
