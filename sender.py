@@ -35,7 +35,7 @@ def RTT_estimation():
 
     # timeout interval will be used in settimeout for each packet
     if TimeoutInterval != 0:
-        sock.settimeout(math.ceil(int(TimeoutInterval)))
+        sock.settimeout(math.ceil(TimeoutInterval))
 
 
 
@@ -134,7 +134,7 @@ def STEP_3_3():
             else:
                 limitation = original 
 
-            payload_size = max((1 + payload_size) /2, last_accepted_payload_size)
+            payload_size = max(payload_size - 1, last_accepted_payload_size)
             # repeat setep 3_3
             return STEP_3_3()
 
@@ -260,9 +260,6 @@ else:
     sent_packets = 0
     original = len(payload)
     limitation = original
-    
-    
-
 
    
     STEP_3_3()
