@@ -56,7 +56,7 @@ def PARAMETER_estimation():
 
     rem_time = target_time - time_elapsed
     rem_data = original - sent_packets
-    rem_packets = math.floor(rem_time/TimeoutInterval)
+    rem_packets = math.ceil(rem_time/TimeoutInterval)
     if time_taken > target_time:
         payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
         payload_size = payload_size if payload_size < limitation else limitation - 1
