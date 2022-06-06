@@ -68,7 +68,7 @@ def PARAMETER_estimation():
 run = 1
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
-    global last_accepted_payload_size, time_taken, limitation, time_elapsed
+    global last_accepted_payload_size, time_taken, limitation, time_elapsed, original
     while remaining_size >= 0:
         # separating the contents -> list format
         separated_payload = payload[0:int(payload_size)]
@@ -137,7 +137,7 @@ def STEP_3_3():
             if payload_size != last_accepted_payload_size: 
                 limitation = payload_size
             else:
-                limitation = len(payload)   
+                limitation = original 
 
             payload_size = max(payload_size - 1, last_accepted_payload_size)
             # repeat setep 3_3
