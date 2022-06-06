@@ -109,6 +109,8 @@ def STEP_3():
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
 
+        if sequence_number == 1:
+            sock.settimeout(math.ceil(TimeoutInterval))
         try:
             # timer for start of initiation
             RTT_start_time = time.time() 
@@ -125,8 +127,8 @@ def STEP_3():
             SampleRTT = (RTT_end_time - RTT_start_time)
             RTT_estimation()
             # timeout interval will be used in settimeout for each packet
-            if TimeoutInterval != 0:
-                sock.settimeout(math.ceil(TimeoutInterval))
+            #if TimeoutInterval != 0:
+            #    sock.settimeout(math.ceil(TimeoutInterval))
                 
             # for each successful upload run is incremented
             run += 1
@@ -136,7 +138,7 @@ def STEP_3():
             # print(remaining_size)
             
 
-        except socket.timeout:
+        except:
             # remaining packets to be sent
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil((original - sent_packets) / payload_size)
