@@ -45,8 +45,10 @@ def PARAMETER_estimation():
     # setting the last_accepted_payload_size to the payload_size
     last_accepted_payload_size = payload_size
 
+    # end time
+    end_time = time.time()
     # time spent since the start of initiation
-    time_elapsed = time.time() - start_time
+    time_elapsed = end_time - start_time
     # check if the total time spent is greater than 95s
     if time_elapsed > target_time:
     # if it is set target_time to 120
@@ -66,14 +68,11 @@ def PARAMETER_estimation():
     # checking which size is greater so that it can try to reach the target time
         payload_size = max( math.ceil(data_left / packets_left), last_accepted_payload_size + 1 )
         # checking if the size is greater than the limit set previously
-        # if it is less
-        if payload_size < limitation:
-        # set the current payload size as the size
-            payload_size = payload_size 
-        # if it is more
-        else:
+        # if it is greater
+        if payload_size > limitation:
         # lessen the limit and set it to the payload size so it can reach the target time
             payload_size = limitation - 1
+
 
 # 3.3: Continuing the program
 # function was used to make the code faster
