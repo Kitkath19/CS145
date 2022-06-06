@@ -109,7 +109,7 @@ def STEP_3():
         # using the intent message from 2.1 send data to address
         sock.sendto(data_packet, (args.IP_address, args.port_receiver))
 
-        if sequence_number == 1:
+        if sequence_number == "1":
             sock.settimeout(math.ceil(TimeoutInterval))
         try:
             # timer for start of initiation
@@ -138,7 +138,7 @@ def STEP_3():
             # print(remaining_size)
             
 
-        except:
+        except socket.timeout:
             # remaining packets to be sent
             # remaining_packets = (95 - time_elapsed) / TimeoutInterval
             remaining_packets = math.ceil((original - sent_packets) / payload_size)
