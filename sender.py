@@ -1,8 +1,8 @@
-import socket
-import sys
-import argparse
-import time
-import math
+import socket           # making and connecting sockets and setting the timeout value
+import argparse         # input
+import time             # time interval, total time spent, and etc.
+import math             # ceil and floor functions
+
 
 
 # 3.1   RTT Estimation
@@ -34,9 +34,6 @@ def RTT_estimation():
     # From the EstimatedRTT and DevRTT, the timeout interval is derived
     TimeoutInterval = EstimatedRTT + (4 * DevRTT)
 
-    
-
-
 # 3.2   Parameter Estimation
 def PARAMETER_estimation():
     # declaration of global variables
@@ -50,29 +47,36 @@ def PARAMETER_estimation():
 
     # time spent since the start of initiation
     time_elapsed = time.time() - start_time
-    target_time = target_time if time_elapsed < target_time else 120
+    # check if the total time spent is greater than 95s
+    if time_elapsed > target_time:
+    # if it is set target_time to 120
+        target_time = 120
     # time left to send the remaining payload
-    rem_time = target_time - time_elapsed
+    time_left = target_time - time_elapsed
     # compute for the remaining data to be sent
-    rem_data = original - sent_packets
+    data_left = original - sent_packets
+    # divide the data into packets then compute for the estimate time it will take
+    time_taken = time_elapsed + (math.ceil(data_left / payload_size) * TimeoutInterval)
     # divide the data into packets
-    rem_packets = math.ceil(rem_data / payload_size)
-    # compute for the estimate time it will take
-    time_taken = time_elapsed + (rem_packets * TimeoutInterval)
-    # divide the data into packets
-    rem_packets = math.floor(rem_time/TimeoutInterval)
+    packets_left = math.floor(time_left/TimeoutInterval)
     
     # chceking if it will exceed the target time of 95s
     # if it is greater
     if time_taken > target_time:
-        payload_size = max( math.ceil(rem_data / rem_packets), last_accepted_payload_size + 1 )
-        payload_size = payload_size if payload_size < limitation else limitation - 1
+    # checking which size is greater so that it can try to reach the target time
+        payload_size = max( math.ceil(data_left / packets_left), last_accepted_payload_size + 1 )
+        # checking if the size is greater than the limit set previously
+        # if it is less
+        if payload_size < limitation:
+        # set the current payload size as the size
+            payload_size = payload_size 
+        # if it is more
+        else:
+        # lessen the limit and set it to the payload size so it can reach the target time
+            payload_size = limitation - 1
 
-
-# Step 3.3: Continuing the program
+# 3.3: Continuing the program
 # function was used to make the code faster
-# number of runs done
-run = 0
 def STEP_3():
     # declaration of global variables
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
@@ -139,17 +143,20 @@ def STEP_3():
             remaining_packets = math.ceil((original - sent_packets) / payload_size)
             # computing for time taken
             time_taken = (remaining_packets * TimeoutInterval) + (TimeoutInterval + time_elapsed)
+            
+            # getting the boundaries of the payload
+            if payload_size != last_accepted_payload_size:
+            # setting the uper bound to the payload size
+                limitation = payload_size
+            # setting the uper bound to the total payload size
+            else:
+                limitation = original
 
-            limitation = payload_size if payload_size != last_accepted_payload_size else original
-            payload_size = max(payload_size - 1, last_accepted_payload_size)
-            # repeat setep 3_3
-            return STEP_3_3()
-
-
-
-
-#declaration of variables that will be used throughout the code
-#global filename_payload, IP_address, port_receiver, port_sender, unique_ID, trasaction_ID, intent_message
+            # computing which payload is bigger
+            # using the payload in the next run
+            payload_size = max((1 + payload_size) / 2, last_accepted_payload_size)
+            # repeat setep 3
+            return STEP_3()
 
 
 # STEP 0: Getting the Command Line Input
@@ -185,7 +192,6 @@ parser.add_argument("-i", "--unique_ID", type=str,
 args = parser.parse_args()
 
 
-
 # STEP 1: Dowloading Payload
 # Transaction Generation/Results Server (TGRS)
 # http://3.0.248.41:5000/get_data?student_id = wwwwwwww
@@ -197,11 +203,13 @@ args = parser.parse_args()
 
 
 # STEP 2: Initiating a Transaction
+
 # 2.1   Intent Message IDwwwwwwww
 # wwwwwwww is the unique ID given in the email
 # default unique_ID = "2099fba5"
 # setting up the intent message of format : ID + unique_iID
 intent_message = f"ID{args.unique_ID}".encode()
+
 # 2.2   Accept Message YYYYYYY
 # accept message will be printed out once it is proven 
 # that there is no alive transaction after doing 2.1
@@ -220,17 +228,17 @@ start_time = time.time()
 trasaction_ID = acknowledgement.decode()
 print(trasaction_ID)
 
-
-
-# Step 2.5: Checking if there is an existing transaction
+# Step 2.3: Checking if there is an existing transaction
 # check if transaction ID says that there is an alive tranaction
 if trasaction_ID == "Existing alive transaction":
 # if there is print Existing alive transaction 
     print(trasaction_ID)
+
+
+# Step 3: sending the Payload
 # if no live tranaction
 # continue on step 3
 else:
-    # sending the Payload
     # sending the data packets
     # intent_message = IDWWWWWWWW
     # retrieve intent_message from PART 2 (un)code it
@@ -258,18 +266,26 @@ else:
     # since no transaction/runs were made
     # computes for the DevRTT
     DevRTT = 0
-    
-    remaining_size = len(payload)
+
+    # PARAMETER_estimation variables
+    # since no transaction/runs were made set variables to 0
     remaining_packets = 0
     time_taken = 0
     last_accepted_payload_size = 0
-    payload_size = 1
-    
-    time_elapsed = 0
-    target_time = 95
     sent_packets = 0
+    time_elapsed = 0
+    # for initial transaction set variables to value
+    # payload = 1 since will get initial 1 packet
+    payload_size = 1
+    # target time is 95s
+    target_time = 95
+    # remaining size set to length of payload since nothing was subtracted
+    remaining_size = len(payload)
+    # original length sof the payload
     original = len(payload)
+    # original upper bound is the highest/length of payload
     limitation = original
-
+    # number of runs done
+    run = 0
    
     STEP_3()
