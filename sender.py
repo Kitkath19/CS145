@@ -67,7 +67,7 @@ run = 0
 def STEP_3_3():
     global payload_size, remaining_size, TimeoutInterval, payload, remaining_packets, start_time, run, SampleRTT
     global last_accepted_payload_size, time_taken, limitation, time_elapsed, original, sent_packets
-    while remaining_size >= 0:
+    while remaining_size > 0:
         # separating the contents -> list format
         separated_payload = payload[sent_packets: sent_packets + int(payload_size)]
         # print(separated_payload)
